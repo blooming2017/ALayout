@@ -11,7 +11,7 @@
 #import "AttrKeyDef.h"
 #import "MeasureSpec.h"
 #import "UIView+FindView.h"
-#import "MarginLayoutParams.h"
+#import "RelativeLayoutLayoutParams.h"
 #import "UIView+Params.h"
 
 @implementation RelativeLayout
@@ -108,11 +108,6 @@
     const BOOL isWrapContentWidth  = (widthMode  != MeasureSpec_EXACTLY);
     const BOOL isWrapContentHeight = (heightMode != MeasureSpec_EXACTLY);
     
-    // We need to know our size for doing the correct computation of children positioning in RTL
-    // mode but there is no practical way to get it instead of running the code below.
-    // So, instead of running the code twice, we just set the width to a "default display width"
-    // before the computation and then, as a last pass, we will update their real position with
-    // an offset equals to "DEFAULT_WIDTH - width".
 //TODO:
 //    const int layoutDirection = getLayoutDirection();
 //    if (isLayoutRtl() && myWidth == -1) {
@@ -127,7 +122,7 @@
         UIView* child = views[i];
         if (Visibility_GONE != [child getVisibility])
         {
-            LayoutParams* params = child.layoutParams;
+            RelativeLayoutLayoutParams* params = (RelativeLayoutLayoutParams*)child.layoutParams;
             int rules[] = params.getRules(layoutDirection);
             
             applyHorizontalSizeRules(params, myWidth, rules);
@@ -203,6 +198,8 @@
     {
         mSortedHorizontalChildren = [NSMutableArray array];
     }
+    
+    
     
 //TODO:
 // 计算依赖顺序

@@ -12,14 +12,14 @@
 
 @implementation LayoutParams
 
-- (instancetype)init:(NSDictionary*)attr
+- (instancetype)initWithAttr:(NSDictionary*)attr
 {
     if(self = [super init])
     {
-        NSNumber* width = attr[android_layout_width];
+        NSNumber* width = attr[ViewGroup_Layout_layout_width];
         _width = width ? width.intValue : LayoutParams_WRAP_CONTENT;
         
-        NSNumber* height = attr[android_layout_height];
+        NSNumber* height = attr[ViewGroup_Layout_layout_height];
         _height = height ? height.intValue : LayoutParams_MATCH_PARENT;
     }
     return self;
@@ -52,4 +52,14 @@ static const void* KEY_layoutParams = &KEY_layoutParams;
 int getParamsInt(id value, int defaultValue)
 {
     return value ? [value intValue] : defaultValue;
+}
+
+BOOL getBool(id value, BOOL defaultValue)
+{
+    return value ? [value boolValue] : defaultValue;
+}
+
+NSString* getResourceId(id value, NSString* defaultValue)
+{
+    return value;
 }

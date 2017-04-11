@@ -47,9 +47,9 @@ enum
     return self;
 }
 
-- (instancetype)init:(NSDictionary*)attr
+- (instancetype)initWithAttr:(NSDictionary*)attr
 {
-    if(self = [super init:attr])
+    if(self = [super initWithAttr:attr])
     {
         int margin = getParamsInt(attr[android_margin], -1);
         if (margin >= 0)

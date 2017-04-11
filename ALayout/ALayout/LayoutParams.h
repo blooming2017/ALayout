@@ -16,7 +16,7 @@ enum
 
 @interface LayoutParams : NSObject
 
-- (instancetype)init:(NSDictionary*)attr;
+- (instancetype)initWithAttr:(NSDictionary*)attr;
 
 @property (nonatomic) int width;
 @property (nonatomic) int height;
@@ -35,3 +35,7 @@ enum
 @end
 
 int getParamsInt(id value, int defaultValue);
+
+BOOL getBool(id value, BOOL defaultValue);
+
+NSString* getResourceId(id value, NSString* defaultValue);

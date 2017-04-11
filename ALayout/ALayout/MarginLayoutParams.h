@@ -10,4 +10,6 @@
 
 @interface MarginLayoutParams : LayoutParams
 
+- (instancetype)initWithAttr:(NSDictionary*)attr;
+
 @end

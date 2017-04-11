@@ -27,6 +27,8 @@
 		28FE72F11E9B990700894E20 /* UIView+FindView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72E81E9B990700894E20 /* UIView+FindView.m */; };
 		28FE72F21E9B990700894E20 /* MarginLayoutParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72EA1E9B990700894E20 /* MarginLayoutParams.m */; };
 		28FE72F31E9B990700894E20 /* LayoutDirection.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72EC1E9B990700894E20 /* LayoutDirection.m */; };
+		28FE72F61E9C6B4300894E20 /* DependencyGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72F51E9C6B4300894E20 /* DependencyGraph.m */; };
+		28FE72F91E9C756D00894E20 /* RelativeLayoutLayoutParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72F81E9C756D00894E20 /* RelativeLayoutLayoutParams.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +69,10 @@
 		28FE72EC1E9B990700894E20 /* LayoutDirection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LayoutDirection.m; sourceTree = "<group>"; };
 		28FE72ED1E9B990700894E20 /* LayoutDirection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayoutDirection.h; sourceTree = "<group>"; };
 		28FE72EE1E9B990700894E20 /* AttrKeyDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttrKeyDef.h; sourceTree = "<group>"; };
+		28FE72F41E9C6B4300894E20 /* DependencyGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DependencyGraph.h; sourceTree = "<group>"; };
+		28FE72F51E9C6B4300894E20 /* DependencyGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DependencyGraph.m; sourceTree = "<group>"; };
+		28FE72F71E9C756D00894E20 /* RelativeLayoutLayoutParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelativeLayoutLayoutParams.h; sourceTree = "<group>"; };
+		28FE72F81E9C756D00894E20 /* RelativeLayoutLayoutParams.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RelativeLayoutLayoutParams.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +157,10 @@
 				28FE72B51E9B982A00894E20 /* RelativeLayout.m */,
 				28FE72B61E9B982A00894E20 /* UIView+ALayout.h */,
 				28FE72B71E9B982A00894E20 /* UIView+ALayout.m */,
+				28FE72F41E9C6B4300894E20 /* DependencyGraph.h */,
+				28FE72F51E9C6B4300894E20 /* DependencyGraph.m */,
+				28FE72F71E9C756D00894E20 /* RelativeLayoutLayoutParams.h */,
+				28FE72F81E9C756D00894E20 /* RelativeLayoutLayoutParams.m */,
 			);
 			path = ALayout;
 			sourceTree = "<group>";
@@ -237,6 +247,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28FE72D21E9B982A00894E20 /* Gravity.m in Sources */,
+				28FE72F91E9C756D00894E20 /* RelativeLayoutLayoutParams.m in Sources */,
 				28FE72D41E9B982A00894E20 /* MeasureSpec.m in Sources */,
 				28FE72E31E9B982A00894E20 /* GDataXMLNode.m in Sources */,
 				28FE72D51E9B982A00894E20 /* RelativeLayout.m in Sources */,
@@ -249,6 +260,7 @@
 				28FE72D61E9B982A00894E20 /* UIView+ALayout.m in Sources */,
 				28FE72D31E9B982A00894E20 /* LayoutParams.m in Sources */,
 				28FE72F11E9B990700894E20 /* UIView+FindView.m in Sources */,
+				28FE72F61E9C6B4300894E20 /* DependencyGraph.m in Sources */,
 				28FE72DD1E9B982A00894E20 /* main.m in Sources */,
 				28FE72D71E9B982A00894E20 /* AppDelegate.m in Sources */,
 			);
