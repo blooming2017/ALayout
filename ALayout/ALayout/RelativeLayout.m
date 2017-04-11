@@ -17,11 +17,6 @@
 
 static NSArray<NSNumber*>* RULES_VERTICAL;
 static NSArray<NSNumber*>* RULES_HORIZONTAL;
-//
-//private static final int[] RULES_HORIZONTAL = {
-//    LEFT_OF, RIGHT_OF, ALIGN_LEFT, ALIGN_RIGHT, START_OF, END_OF, ALIGN_START, ALIGN_END
-//};
-//
 
 #define DEFAULT_WIDTH 0x00010000
 
