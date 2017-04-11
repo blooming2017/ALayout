@@ -33,6 +33,11 @@ enum
     VIEW_PFLAG2_LAYOUT_DIRECTION_RESOLVED_RTL   = 4          << VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT
 };
 
+enum
+{
+    VIEW_SCROLLBARS_INSIDE_OVERLAY = 0
+};
+
 @interface UIView(Params)
 
 @property (nonatomic) int measuredWidth;

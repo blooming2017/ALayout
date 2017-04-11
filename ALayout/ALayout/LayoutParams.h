@@ -33,6 +33,12 @@ enum
 
 int getParamsInt(id value, int defaultValue);
 
+float getParamsFloat(id value, float defaultValue);
+
 BOOL getBool(id value, BOOL defaultValue);
 
 NSString* getResourceId(id value, NSString* defaultValue);
+
+int getDimensionPixelSize(id value, int defaultValue);
+
+int getDimensionPixelOffset(id value, int defaultValue);

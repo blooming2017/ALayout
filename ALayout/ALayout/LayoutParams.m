@@ -85,6 +85,11 @@ int getParamsInt(id value, int defaultValue)
     return value ? [value intValue] : defaultValue;
 }
 
+float getParamsFloat(id value, float defaultValue)
+{
+    return value ? [value floatValue] : defaultValue;
+}
+
 BOOL getBool(id value, BOOL defaultValue)
 {
     assert([value isKindOfClass:NSString.class]);
@@ -111,3 +116,21 @@ NSString* getResourceId(id value, NSString* defaultValue)
     }
     return idStr;
 }
+
+int getDimensionPixelSize(id value, int defaultValue)
+{
+    assert([value isKindOfClass:NSString.class]);
+    
+    NSString* strPx = (NSString*)value;
+    if([strPx hasSuffix:@"px"])
+    {
+        strPx = [strPx substringToIndex:strPx.length - 2];
+    }
+    return strPx ? strPx.intValue : defaultValue;
+}
+
+int getDimensionPixelOffset(id value, int defaultValue)
+{
+    return getDimensionPixelSize(value, defaultValue);
+}
+
