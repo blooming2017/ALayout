@@ -74,14 +74,8 @@ static Class viewClass(NSString* className)
     Class cls = viewClass(className);
     UIView* view = [cls new];
     [self preParseAttr:attr view:view];
+    [(id<ALayoutProtocol>)view parseAttr:attr];
     
-    if([view conformsToProtocol:@protocol(ALayoutProtocol)])
-    {
-        if([view respondsToSelector:@selector(parseAttr:)])
-        {
-            [(id<ALayoutProtocol>)view parseAttr:attr];
-        }
-    }
     return view;
 }
 

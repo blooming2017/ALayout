@@ -26,6 +26,26 @@
 //View_translationY
 //View_translationZ
 //View_elevation
+#define View_background         @"android:background"
+#define View_padding            @"android:padding"
+#define View_paddingLeft        @"android:paddingLeft"
+#define View_paddingTop         @"android:paddingTop"
+#define View_paddingRight       @"android:paddingRight"
+#define View_paddingBottom      @"android:paddingBottom"
+#define View_paddingStart       @"android:paddingStart"
+#define View_paddingEnd         @"android:paddingEnd"
+#define View_scrollX            @"android:scrollX"
+#define View_scrollY            @"android:scrollY"
+#define View_alpha              @"android:alpha"
+#define View_transformPivotX    @"android:transformPivotX"
+#define View_transformPivotY    @"android:transformPivotY"
+#define View_translationX       @"android:translationX"
+#define View_translationY       @"android:translationY"
+#define View_translationZ       @"android:translationZ"
+#define View_elevation          @"android:elevation"
+
+
+#pragma mark KEYS
 
 #define ViewGroup_Layout_layout_width                           @"android:layout_width"
 #define ViewGroup_Layout_layout_height                          @"android:layout_height"
@@ -66,6 +86,19 @@
 #define RelativeLayout_Layout_layout_alignParentStart           @"android:alignParentStart"
 #define RelativeLayout_Layout_layout_alignParentEnd             @"android:alignParentEnd"
 #define RelativeLayout_Layout_layout_alignWithParentIfMissing   @"android:layout_alignWithParentIfMissing"
+
+
+
+
+
+
+
+#pragma mark VALUES
+
+#define V_match_parent @"match_parent"
+#define V_wrap_content @"wrap_content"
+
+
 
 
 #endif /* AttrKeyDef_h */

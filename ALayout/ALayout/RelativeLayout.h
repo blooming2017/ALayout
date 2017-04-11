@@ -124,7 +124,7 @@ enum
 // */
 //private static final int VALUE_NOT_SET = Integer.MIN_VALUE;
 
-@interface RelativeLayout : ViewGroup<ALayoutProtocol>
+@interface RelativeLayout : ViewGroup
 
 @end
 

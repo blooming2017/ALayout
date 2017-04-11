@@ -17,6 +17,8 @@
     if(self = [super initWithAttr:attr])
     {
         _rules = [NSMutableDictionary dictionary];
+        
+        [self parseAttr:attr];
     }
     return self;
 }

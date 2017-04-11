@@ -40,6 +40,8 @@ enum
 
 - (ViewParams*)viewParams;
 
+- (void)setViewAttr:(NSDictionary*)attr;
+
 - (VisibilityMode)visibility;
 
 - (void)setVisibility:(VisibilityMode)visibilityMode;

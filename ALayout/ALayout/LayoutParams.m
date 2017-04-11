@@ -16,11 +16,42 @@
 {
     if(self = [super init])
     {
-        NSNumber* width = attr[ViewGroup_Layout_layout_width];
-        _width = width ? width.intValue : LayoutParams_WRAP_CONTENT;
+        _width = LayoutParams_WRAP_CONTENT;
+        _height = LayoutParams_WRAP_CONTENT;
         
-        NSNumber* height = attr[ViewGroup_Layout_layout_height];
-        _height = height ? height.intValue : LayoutParams_MATCH_PARENT;
+        NSString* width = attr[ViewGroup_Layout_layout_width];
+        if(width)
+        {
+            if([width isEqualToString:V_match_parent])
+            {
+                _width = LayoutParams_MATCH_PARENT;
+            }
+            else if([width isEqualToString:V_wrap_content])
+            {
+                _width = LayoutParams_WRAP_CONTENT;
+            }
+            else
+            {
+                _width = [width intValue];
+            }
+        }
+        
+        NSString* height = attr[ViewGroup_Layout_layout_height];
+        if(height)
+        {
+            if([height isEqualToString:V_match_parent])
+            {
+                _height = LayoutParams_MATCH_PARENT;
+            }
+            else if([height isEqualToString:V_wrap_content])
+            {
+                _height = LayoutParams_WRAP_CONTENT;
+            }
+            else
+            {
+                _height = [height intValue];
+            }   
+        }
     }
     return self;
 }
@@ -56,10 +87,27 @@ int getParamsInt(id value, int defaultValue)
 
 BOOL getBool(id value, BOOL defaultValue)
 {
-    return value ? [value boolValue] : defaultValue;
+    assert([value isKindOfClass:NSString.class]);
+    NSString* boolStrValue = (NSString*)value;
+    if(boolStrValue)
+    {
+        return [boolStrValue isEqualToString:@"true"];
+    }
+    return defaultValue;
 }
 
 NSString* getResourceId(id value, NSString* defaultValue)
 {
-    return value;
+    assert([value isKindOfClass:NSString.class]);
+    NSString* idStr = (NSString*)value;
+    NSRange range = [idStr rangeOfString:@"/" options:NSBackwardsSearch];
+    if(range.length)
+    {
+        idStr = [idStr substringFromIndex:range.location+range.length];
+    }
+    else
+    {
+        idStr = defaultValue;
+    }
+    return idStr;
 }

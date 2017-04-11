@@ -7,10 +7,16 @@
 //
 
 #import "UIView+ALayout.h"
+#import "UIView+Params.h"
 #import "ALayout.h"
 
 @implementation UIView(ALayout)
 
 RegisterView(view);
+
+- (void)parseAttr:(NSDictionary*)attr
+{
+    [self setViewAttr:attr];
+}
 
 @end

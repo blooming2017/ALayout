@@ -66,8 +66,13 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
 
 - (void)parseAttr:(NSDictionary *)attr
 {
+    [super parseAttr:attr];
+    
     mIgnoreGravity = attr[RelativeLayout_ignoreGravity];
     mGravity = getParamsInt(attr[RelativeLayout_gravity], mGravity);
+    
+    RelativeLayoutLayoutParams* layoutParams = [[RelativeLayoutLayoutParams alloc] initWithAttr:attr];
+    self.layoutParams = layoutParams;
 }
 
 - (void)setNeedsLayout
