@@ -18,7 +18,6 @@
 		28FE72D81E9B982A00894E20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 28FE72BA1E9B982A00894E20 /* Assets.xcassets */; };
 		28FE72D91E9B982A00894E20 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 28FE72BC1E9B982A00894E20 /* LaunchScreen.storyboard */; };
 		28FE72DA1E9B982A00894E20 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 28FE72BE1E9B982A00894E20 /* Main.storyboard */; };
-		28FE72DB1E9B982A00894E20 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 28FE72C01E9B982A00894E20 /* Info.plist */; };
 		28FE72DD1E9B982A00894E20 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72C31E9B982A00894E20 /* main.m */; };
 		28FE72E11E9B982A00894E20 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72CB1E9B982A00894E20 /* ViewController.m */; };
 		28FE72E31E9B982A00894E20 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72D01E9B982A00894E20 /* GDataXMLNode.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -232,7 +231,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28FE72DB1E9B982A00894E20 /* Info.plist in Resources */,
 				28FE72DA1E9B982A00894E20 /* Main.storyboard in Resources */,
 				28FE72D81E9B982A00894E20 /* Assets.xcassets in Resources */,
 				28FE72D91E9B982A00894E20 /* LaunchScreen.storyboard in Resources */,
@@ -381,7 +379,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				HEADER_SEARCH_PATHS = "${SDK_DIR}/usr/include/libxml2";
-				INFOPLIST_FILE = RMLayout/Info.plist;
+				INFOPLIST_FILE = ALayout/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = asdjf.sdf.RMLayout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -394,7 +392,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				HEADER_SEARCH_PATHS = "${SDK_DIR}/usr/include/libxml2";
-				INFOPLIST_FILE = RMLayout/Info.plist;
+				INFOPLIST_FILE = ALayout/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = asdjf.sdf.RMLayout;
 				PRODUCT_NAME = "$(TARGET_NAME)";

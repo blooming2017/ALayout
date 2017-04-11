@@ -6,20 +6,11 @@
 //  Copyright © 2017年 ajja.sdjkf.sd. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "UIView+FindView.h"
 #import "RelativeLayoutLayoutParams.h"
 #import "DependencyGraph.h"
 
-@interface Node : NSObject
-
-@property (nonatomic) UIView* view;
-@property (nonatomic) NSMutableArray<Node*>* dependents;
-@property (nonatomic) NSMutableDictionary<NSString*, Node*>* dependencies;
-
-@end
-
-@implementation Node
+@implementation DependencyGraph_Node
 
 - (instancetype)initWithView:(UIView*)view
 {
@@ -34,26 +25,21 @@
 
 
 @implementation DependencyGraph
-{
-    NSMutableArray<Node*>* mNodes;
-    NSMutableDictionary<NSString*, Node*>* mKeyNodes;
-    NSMutableArray<Node*>* mRoots;
-}
 
 - (instancetype)init
 {
     if(self = [super init])
     {
-        mNodes = [NSMutableArray new];
-        mKeyNodes = [NSMutableDictionary new];
-        mRoots = [NSMutableArray new];
+        _nodes = [NSMutableArray new];
+        _keyNodes = [NSMutableDictionary new];
+        _roots = [NSMutableArray new];
     }
     return self;
 }
 
 - (void)clear
 {
-    NSMutableArray<Node*>* nodes = mNodes;
+    NSMutableArray<DependencyGraph_Node*>* nodes = _nodes;
     int count = (int)nodes.count;
     
     for(int i = 0; i < count; i++)
@@ -61,26 +47,26 @@
         // [nodes[i] release];
     }
     [nodes removeAllObjects];
-    [mKeyNodes removeAllObjects];
-    [mRoots removeAllObjects];
+    [_keyNodes removeAllObjects];
+    [_roots removeAllObjects];
 }
 
 - (void)add:(UIView*)view
 {
     NSString* strTag = view.strTag;
-    Node* node = [[Node alloc] initWithView:view];
+    DependencyGraph_Node* node = [[DependencyGraph_Node alloc] initWithView:view];
     if(strTag)
     {
-        mKeyNodes[strTag] = node;
+        _keyNodes[strTag] = node;
     }
-    [mNodes addObject:node];
+    [_nodes addObject:node];
 }
 
-- (void)getSortedViews:(NSMutableArray<UIView*>*)sorted rules:(const int*)rules count:(const int)rulesCount
+- (void)getSortedViews:(NSMutableArray<UIView*>*)sorted rules:(NSArray<NSNumber*>*) rules
 {
-    NSMutableArray<Node*>* roots = [self findRoots:rules count:rulesCount];
+    NSMutableArray<DependencyGraph_Node*>* roots = [self findRoots:rules];
     
-    Node* node;
+    DependencyGraph_Node* node;
     while ((node = roots.lastObject))
     {
         [roots removeLastObject];
@@ -90,12 +76,12 @@
         
         [sorted addObject:view];
         
-        NSMutableArray<Node*>* dependents = node.dependents;
+        NSMutableArray<DependencyGraph_Node*>* dependents = node.dependents;
         int count = (int)dependents.count;
         for (int i = 0; i < count; i++)
         {
-            Node* dependent = dependents[i];
-            NSMutableDictionary<NSString*, Node*>* dependencies = dependent.dependencies;
+            DependencyGraph_Node* dependent = dependents[i];
+            NSMutableDictionary<NSString*, DependencyGraph_Node*>* dependencies = dependent.dependencies;
             
             [dependencies removeObjectForKey:key];
             if (0 == dependencies.count)
@@ -106,33 +92,34 @@
     }
 }
 
-- (NSMutableArray<Node*>*)findRoots:(const int*)rulesFilter count:(const int)filterCount
+- (NSMutableArray<DependencyGraph_Node*>*)findRoots:(NSArray<NSNumber*>*)rulesFilter
 {
-    NSMutableDictionary<NSString*, Node*>* keyNodes = mKeyNodes;
-    NSMutableArray<Node*>* nodes = mNodes;
+    NSMutableDictionary<NSString*, DependencyGraph_Node*>* keyNodes = _keyNodes;
+    NSMutableArray<DependencyGraph_Node*>* nodes = _nodes;
     
     const int count = (int)nodes.count;
     
     for (int i = 0; i < count; i++)
     {
-        Node* node = nodes[i];
+        DependencyGraph_Node* node = nodes[i];
         [node.dependents removeAllObjects];
         [node.dependencies removeAllObjects];
     }
     
+    const int filterCount = (int)rulesFilter.count;
+    
     for (int i = 0; i < count; i++)
     {
-        Node* node = nodes[i];
-        
+        DependencyGraph_Node* node = nodes[i];
         RelativeLayoutLayoutParams* layoutParams = (RelativeLayoutLayoutParams*)node.view.layoutParams;
-        NSDictionary<NSNumber*, NSString*>* rules = layoutParams.rules;
+        RelativeRule* rules = layoutParams.rules;
         
         for (int j = 0; j < filterCount; j++)
         {
-            NSString* rule = rules[@(rulesFilter[j])];
+            NSString* rule = rules[rulesFilter[j]];
             if (rule)
             {
-                Node* dependency = keyNodes[rule];
+                DependencyGraph_Node* dependency = keyNodes[rule];
                 if (dependency && dependency != node)
                 {
                     [dependency.dependents addObject:node];
@@ -142,12 +129,12 @@
         }
     }
     
-    NSMutableArray<Node*>* roots = mRoots;
+    NSMutableArray<DependencyGraph_Node*>* roots = _roots;
     [roots removeAllObjects];
     
     for (int i = 0; i < count; i++)
     {
-        Node* node = nodes[i];
+        DependencyGraph_Node* node = nodes[i];
         if (node.dependencies.count == 0)
         {
             [roots addObject:node];

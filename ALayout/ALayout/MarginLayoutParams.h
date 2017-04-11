@@ -10,6 +10,23 @@
 
 @interface MarginLayoutParams : LayoutParams
 
+@property (assign) int leftMargin;
+@property (assign) int topMargin;
+@property (assign) int rightMargin;
+@property (assign) int bottomMargin;
+
+@property (assign) int startMargin;
+@property (assign) int endMargin;
+
 - (instancetype)initWithAttr:(NSDictionary*)attr;
 
+- (void)resolveLayoutDirection:(int)layoutDirection;
+
+- (int)layoutDirection;
+
+- (BOOL)isLayoutRtl;
+
 @end
+
+
+

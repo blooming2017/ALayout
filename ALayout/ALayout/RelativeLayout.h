@@ -114,18 +114,11 @@ enum
      * Rule that aligns the child's end edge with its RelativeLayout
      * parent's end edge.
      */
-    RelativeLayout_ALIGN_PARENT_END         = 21
+    RelativeLayout_ALIGN_PARENT_END         = 21,
+    
+    RelativeLayout_VALUE_NOT_SET            = INT_MIN
 };
 
-
-//private static final int[] RULES_VERTICAL = {
-//    ABOVE, BELOW, ALIGN_BASELINE, ALIGN_TOP, ALIGN_BOTTOM
-//};
-//
-//private static final int[] RULES_HORIZONTAL = {
-//    LEFT_OF, RIGHT_OF, ALIGN_LEFT, ALIGN_RIGHT, START_OF, END_OF, ALIGN_START, ALIGN_END
-//};
-//
 ///**
 // * Used to indicate left/right/top/bottom should be inferred from constraints
 // */

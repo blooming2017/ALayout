@@ -26,14 +26,6 @@ enum
 
 @implementation MarginLayoutParams
 {
-    int leftMargin;
-    int topMargin;
-    int rightMargin;
-    int bottomMargin;
-    
-    int startMargin;
-    int endMargin;
-    
     unsigned char mMarginFlags;
 }
 
@@ -41,8 +33,8 @@ enum
 {
     if(self = [super init])
     {
-        startMargin = DEFAULT_MARGIN_RELATIVE;
-        endMargin = DEFAULT_MARGIN_RELATIVE;
+        _startMargin = DEFAULT_MARGIN_RELATIVE;
+        _endMargin = DEFAULT_MARGIN_RELATIVE;
     }
     return self;
 }
@@ -51,35 +43,35 @@ enum
 {
     if(self = [super initWithAttr:attr])
     {
-        int margin = getParamsInt(attr[android_margin], -1);
+        int margin = getParamsInt(attr[ViewGroup_MarginLayout_layout_margin], -1);
         if (margin >= 0)
         {
-            leftMargin   = margin;
-            topMargin    = margin;
-            rightMargin  = margin;
-            bottomMargin = margin;
+            _leftMargin   = margin;
+            _topMargin    = margin;
+            _rightMargin  = margin;
+            _bottomMargin = margin;
         }
         else
         {
-            leftMargin   = getParamsInt(attr[android_marginLeft], UNDEFINED_MARGIN);
-            if (UNDEFINED_MARGIN == leftMargin)
+            _leftMargin   = getParamsInt(attr[ViewGroup_MarginLayout_layout_marginLeft], UNDEFINED_MARGIN);
+            if (UNDEFINED_MARGIN == _leftMargin)
             {
                 mMarginFlags |= LEFT_MARGIN_UNDEFINED_MASK;
-                leftMargin    = DEFAULT_MARGIN_RESOLVED;
+                _leftMargin    = DEFAULT_MARGIN_RESOLVED;
             }
             
-            rightMargin  = getParamsInt(attr[android_marginRight], UNDEFINED_MARGIN);
-            if (UNDEFINED_MARGIN == rightMargin)
+            _rightMargin  = getParamsInt(attr[ViewGroup_MarginLayout_layout_marginRight], UNDEFINED_MARGIN);
+            if (UNDEFINED_MARGIN == _rightMargin)
             {
                 mMarginFlags |= RIGHT_MARGIN_UNDEFINED_MASK;
-                rightMargin   = DEFAULT_MARGIN_RESOLVED;
+                _rightMargin   = DEFAULT_MARGIN_RESOLVED;
             }
             
-            topMargin    = getParamsInt(attr[android_marginTop], DEFAULT_MARGIN_RESOLVED);
-            bottomMargin = getParamsInt(attr[android_marginBottom], DEFAULT_MARGIN_RESOLVED);
+            _topMargin    = getParamsInt(attr[ViewGroup_MarginLayout_layout_marginTop], DEFAULT_MARGIN_RESOLVED);
+            _bottomMargin = getParamsInt(attr[ViewGroup_MarginLayout_layout_marginBottom], DEFAULT_MARGIN_RESOLVED);
             
-            startMargin  = getParamsInt(attr[android_marginStart], DEFAULT_MARGIN_RELATIVE);
-            endMargin    = getParamsInt(attr[android_marginEnd], DEFAULT_MARGIN_RELATIVE);
+            _startMargin  = getParamsInt(attr[ViewGroup_MarginLayout_layout_marginStart], DEFAULT_MARGIN_RELATIVE);
+            _endMargin    = getParamsInt(attr[ViewGroup_MarginLayout_layout_marginEnd], DEFAULT_MARGIN_RELATIVE);
             
             if (self.isMarginRelative)
             {
@@ -98,9 +90,23 @@ enum
     return self;
 }
 
+- (BOOL) isLayoutRtl
+{
+    return NO; //TODO: ((mMarginFlags & LAYOUT_DIRECTION_MASK) == View.LAYOUT_DIRECTION_RTL);
+}
+
+- (int)layoutDirection
+{
+    return (mMarginFlags & LAYOUT_DIRECTION_MASK);
+}
+
 - (BOOL)isMarginRelative
 {
-    return ((startMargin != DEFAULT_MARGIN_RELATIVE) || (endMargin != DEFAULT_MARGIN_RELATIVE));
+    return ((_startMargin != DEFAULT_MARGIN_RELATIVE) || (_endMargin != DEFAULT_MARGIN_RELATIVE));
+}
+
+- (void)resolveLayoutDirection:(int)layoutDirection
+{
 }
 
 @end

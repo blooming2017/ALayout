@@ -21,9 +21,6 @@ enum
 @property (nonatomic) int width;
 @property (nonatomic) int height;
 
-@property (nonatomic) int measuredWidth;
-@property (nonatomic) int measuredHeight;
-
 @end
 
 @interface UIView(ALayoutParams)

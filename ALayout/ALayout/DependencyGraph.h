@@ -6,8 +6,24 @@
 //  Copyright © 2017年 ajja.sdjkf.sd. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+@interface DependencyGraph_Node : NSObject
+
+@property (nonatomic) UIView* view;
+@property (nonatomic) NSMutableArray<DependencyGraph_Node*>* dependents;
+@property (nonatomic) NSMutableDictionary<NSString*, DependencyGraph_Node*>* dependencies;
+
+@end
 
 @interface DependencyGraph : NSObject
+
+@property (nonatomic) NSMutableArray<DependencyGraph_Node*>* nodes;
+@property (nonatomic) NSMutableDictionary<NSString*, DependencyGraph_Node*>* keyNodes;
+@property (nonatomic) NSMutableArray<DependencyGraph_Node*>* roots;
+
+- (void)add:(UIView*)view;
+
+- (void)getSortedViews:(NSMutableArray<UIView*>*)sorted rules:(NSArray<NSNumber*>*) rules;
 
 @end
