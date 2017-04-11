@@ -31,7 +31,7 @@
 
 @interface ALayout : NSObject
 
-- (instancetype)init:(NSDictionary*)attr;
+- (instancetype)initWithDict:(NSDictionary*)attr;
 
 - (UIView*)parse;
 

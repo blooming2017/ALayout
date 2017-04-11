@@ -12,14 +12,30 @@
 
 static NSMutableDictionary* ViewClassRegisters = nil;
 
-void RegisterViewClass(NSString* viewName, Class cls)
+void RegisterViewClass(NSString* className, Class cls)
 {
     if(!ViewClassRegisters) ViewClassRegisters = [NSMutableDictionary new];
 #ifdef DEBUG
     //不能重复注册
-    assert(!ViewClassRegisters[viewName]);
+    assert(!ViewClassRegisters[className]);
 #endif
-    ViewClassRegisters[viewName] = cls;
+    ViewClassRegisters[className] = cls;
+}
+
+static Class viewClass(NSString* className)
+{
+    Class cls = ViewClassRegisters[className];
+    
+#ifdef DEBUG
+    assert(className);
+#endif
+    
+    if(!cls && className)
+    {
+        cls = NSClassFromString(className);
+        ViewClassRegisters[className] = cls;
+    }
+    return cls;
 }
 
 @implementation UIView(ALayoutProtocol)
@@ -31,7 +47,7 @@ void RegisterViewClass(NSString* viewName, Class cls)
     NSDictionary* _attr;
 }
 
-- (instancetype)init:(NSDictionary*)attr
+- (instancetype)initWithDict:(NSDictionary*)attr
 {
     if(self = [super init])
     {
@@ -42,7 +58,7 @@ void RegisterViewClass(NSString* viewName, Class cls)
 
 - (UIView*)parse
 {
-    return [self parseView:_attr];
+    return [self parseTree:_attr];
 }
 
 - (UIView*)parseTree:(NSDictionary*)attr
@@ -52,19 +68,10 @@ void RegisterViewClass(NSString* viewName, Class cls)
     return view;
 }
 
-- (void)parseChildren:(NSArray<NSDictionary*>*) children parent:(UIView*)parent
-{
-    for(NSDictionary* attr in children)
-    {
-        UIView* view = [self parseView:attr];
-        [parent addSubview:view];
-    }
-}
-
 - (UIView*)parseView:(NSDictionary*)attr
 {
     NSString* className = attr[@"class"];
-    Class cls = ViewClassRegisters[className];
+    Class cls = viewClass(className);
     UIView* view = [cls new];
     [self preParseAttr:attr view:view];
     
@@ -76,6 +83,15 @@ void RegisterViewClass(NSString* viewName, Class cls)
         }
     }
     return view;
+}
+
+- (void)parseChildren:(NSArray<NSDictionary*>*) children parent:(UIView*)parent
+{
+    for(NSDictionary* attr in children)
+    {
+        UIView* view = [self parseView:attr];
+        [parent addSubview:view];
+    }
 }
 
 - (void)preParseAttr:(NSDictionary*)attr view:(UIView*)view

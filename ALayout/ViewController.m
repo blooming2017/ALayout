@@ -10,7 +10,7 @@
 
 #import "GDataXMLNode.h"
 
-#import "UIView+ALayout.h"
+#import "ALayout.h"
 
 @interface ViewController ()
 
@@ -21,13 +21,10 @@
 NSMutableString* string = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
+//
+//    NSData* data = [NSData dataWithContentsOfFile:@"/Users/bell/myspace/androidsrc/src/frameworks/base/packages/Keyguard/test/res/layout/keyguard_test_activity.xml"];
     
-//    UIView* aa = [UIView CreateView];
-//    
-//    UIView* bb = [UILabel CreateView];
-    
-    NSData* data = [NSData dataWithContentsOfFile:@"/Users/bell/myspace/androidsrc/src/frameworks/base/packages/Keyguard/test/res/layout/keyguard_test_activity.xml"];
-    
+    NSData* data = [NSData dataWithContentsOfFile:@"/Users/bell/myspace/android_s/app/src/main/res/layout/activity_main.xml"];
     
     GDataXMLDocument *doc = [[GDataXMLDocument alloc] initWithData:data options:0 error:nil];
     
@@ -40,6 +37,13 @@ NSMutableString* string = nil;
     [self print:root];
     
     NSLog(@"%@", string);
+    
+    NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:nil];
+    
+    ALayout* alayout = [[ALayout alloc] initWithDict:dict];
+    UIView* view = [alayout parse];
+    NSLog(@"%@", view);
+    
 }
 
 - (void)print:(GDataXMLNode*)node
