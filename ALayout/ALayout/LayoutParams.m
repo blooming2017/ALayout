@@ -12,13 +12,20 @@
 
 @implementation LayoutParams
 
-- (instancetype)initWithAttr:(NSDictionary*)attr
+- (instancetype)init
 {
     if(self = [super init])
     {
         _width = LayoutParams_WRAP_CONTENT;
         _height = LayoutParams_WRAP_CONTENT;
-        
+    }
+    return self;
+}
+
+- (instancetype)initWithAttr:(NSDictionary*)attr
+{
+    if(self = [super init])
+    {
         NSString* width = attr[ViewGroup_Layout_layout_width];
         if(width)
         {

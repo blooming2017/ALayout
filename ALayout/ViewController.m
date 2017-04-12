@@ -12,6 +12,8 @@
 
 #import "ALayout.h"
 
+#import "UIView+Params.h"
+
 @interface ViewController ()
 
 @end
@@ -44,6 +46,9 @@ NSMutableString* string = nil;
     UIView* view = [alayout parse];
     NSLog(@"%@", view);
     
+    [self.view addSubview:view];
+    
+    [view measureHierarchy:self.view.layoutParams width:self.view.frame.size.width height:self.view.frame.size.height];
 }
 
 - (void)print:(GDataXMLNode*)node

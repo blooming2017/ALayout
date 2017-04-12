@@ -22,9 +22,9 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
 
 @implementation RelativeLayout
 {
-    int mGravity;
-    NSString* mIgnoreGravity;
-    BOOL mDirtyHierarchy;
+    int _gravity;
+    NSString* _ignoreGravity;
+    BOOL _dirtyHierarchy;
     
     DependencyGraph* _graph;
     
@@ -58,8 +58,10 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
 {
     if(self = [super init])
     {
-        mGravity = Gravity_START | Gravity_TOP;
+        _gravity = Gravity_START | Gravity_TOP;
         _graph = [[DependencyGraph alloc] init];
+        
+        _dirtyHierarchy = YES;
     }
     return self;
 }
@@ -68,8 +70,8 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
 {
     [super parseAttr:attr];
     
-    mIgnoreGravity = attr[RelativeLayout_ignoreGravity];
-    mGravity = getParamsInt(attr[RelativeLayout_gravity], mGravity);
+    _ignoreGravity = attr[RelativeLayout_ignoreGravity];
+    _gravity = getParamsInt(attr[RelativeLayout_gravity], _gravity);
 }
 
 - (LayoutParams*)generateLayoutParams:(NSDictionary *)attr
@@ -80,7 +82,7 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
 - (void)setNeedsLayout
 {
     [super setNeedsLayout];
-    mDirtyHierarchy = YES;
+    _dirtyHierarchy = YES;
 }
 
 - (void)sortChildren
@@ -111,9 +113,9 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
 
 - (void)onMeasure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec
 {
-    if (mDirtyHierarchy)
+    if (_dirtyHierarchy)
     {
-        mDirtyHierarchy = NO;
+        _dirtyHierarchy = NO;
         [self sortChildren];
     }
     
@@ -123,10 +125,10 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     int width  = 0;
     int height = 0;
     
-    const int widthMode  = [MeasureSpec getMode:  widthMeasureSpec];
-    const int heightMode = [MeasureSpec getMode: heightMeasureSpec];
-    const int widthSize  = [MeasureSpec getSize:  widthMeasureSpec];
-    const int heightSize = [MeasureSpec getSize: heightMeasureSpec];
+    const int widthMode  = [MeasureSpec mode:  widthMeasureSpec];
+    const int heightMode = [MeasureSpec mode: heightMeasureSpec];
+    const int widthSize  = [MeasureSpec size:  widthMeasureSpec];
+    const int heightSize = [MeasureSpec size: heightMeasureSpec];
     
     if (MeasureSpec_UNSPECIFIED != widthMode)
     {
@@ -150,10 +152,10 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     
     UIView* ignore = nil;
     
-    int gravity = mGravity & Gravity_RELATIVE_HORIZONTAL_GRAVITY_MASK;
+    int gravity = _gravity & Gravity_RELATIVE_HORIZONTAL_GRAVITY_MASK;
     const BOOL horizontalGravity = ((gravity != Gravity_START) && (gravity != 0));
     
-    gravity = mGravity & Gravity_VERTICAL_GRAVITY_MASK;
+    gravity = _gravity & Gravity_VERTICAL_GRAVITY_MASK;
     const BOOL verticalGravity = ((gravity != Gravity_TOP) && (gravity != 0));
     
     int left    = INT_MAX;
@@ -164,9 +166,9 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     BOOL offsetHorizontalAxis = false;
     BOOL offsetVerticalAxis = false;
     
-    if ((horizontalGravity || verticalGravity) && mIgnoreGravity)
+    if ((horizontalGravity || verticalGravity) && _ignoreGravity)
     {
-        ignore = self[mIgnoreGravity];
+        ignore = self[_ignoreGravity];
     }
     
     const BOOL isWrapContentWidth  = (widthMode  != MeasureSpec_EXACTLY);

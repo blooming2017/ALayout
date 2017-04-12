@@ -38,9 +38,7 @@ enum
 enum
 {
     VIEW_OVER_SCROLL_ALWAYS = 0,
-
     VIEW_OVER_SCROLL_IF_CONTENT_SCROLLS = 1,
-
     VIEW_OVER_SCROLL_NEVER = 2
 };
 
@@ -60,6 +58,8 @@ enum
 
 - (LayoutParams*)generateLayoutParams:(NSDictionary*)attr;
 
+- (NSMutableDictionary<NSNumber*, NSNumber*>*)measureCache;
+
 - (VisibilityMode)visibility;
 
 - (void)setVisibility:(VisibilityMode)visibilityMode;
@@ -77,6 +77,10 @@ enum
 
 //
 - (void)measure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec;
+
+- (BOOL)measureHierarchy:(LayoutParams*)lp
+                   width:(int)desiredWindowWidth
+                  height:(int)desiredWindowHeight;
 
 @end
 

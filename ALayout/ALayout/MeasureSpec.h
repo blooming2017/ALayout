@@ -21,10 +21,10 @@ typedef enum
     
 } MeasureSpecMode;
 
-+ (int)getMode:(int)measureSpec;
++ (int)mode:(int)measureSpec;
 
 + (int)makeMeasureSpec:(int)size mode:(MeasureSpecMode)mode;
 
-+ (int)getSize:(int)measureSpec;
++ (int)size:(int)measureSpec;
 
 @end

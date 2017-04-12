@@ -59,7 +59,10 @@ static Class viewClass(NSString* className)
 
 - (UIView*)parse
 {
-    return [self parseTree:_attr];
+    UIView* view = [self parseTree:_attr];
+    LayoutParams* layoutParams = [view generateLayoutParams:_attr];
+    view.layoutParams = layoutParams;
+    return view;
 }
 
 - (UIView*)parseTree:(NSDictionary*)attr

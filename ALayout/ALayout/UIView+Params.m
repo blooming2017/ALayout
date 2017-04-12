@@ -9,14 +9,31 @@
 #import <objc/runtime.h>
 #import "AttrKeyDef.h"
 #import "UIView+Params.h"
+#import "UIView+ALayout.h"
 #import "UIView+FindView.h"
 #import "LayoutParams.h"
+#import "MeasureSpec.h"
 
 enum
 {
-    VIEW_UNDEFINED_PADDING          = INT_MIN,
-    
-    VIEW_LAYOUT_DIRECTION_DEFAULT   = VIEW_LAYOUT_DIRECTION_INHERIT
+    VIEW_UNDEFINED_PADDING              = INT_MIN,
+    VIEW_LAYOUT_DIRECTION_DEFAULT       = VIEW_LAYOUT_DIRECTION_INHERIT
+};
+
+enum
+{
+    VIEW_PFLAG_MEASURED_DIMENSION_SET   = 0x00000800
+};
+
+enum
+{
+    VIEW_PFLAG_FORCE_LAYOUT             = 0x00001000,
+    VIEW_PFLAG_LAYOUT_REQUIRED          = 0x00002000
+};
+
+enum
+{
+    VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT = 0x8
 };
 
 static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
@@ -31,7 +48,9 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
 @public
     VisibilityMode mVisibilityMode;
     
+    int _privateFlags;
     int _privateFlags2;
+    int _privateFlags3;
     
     int _paddingLeft;
     int _paddingRight;
@@ -43,6 +62,9 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     int _measuredWidth;
     int _measuredHeight;
     
+    int _oldWidthMeasureSpec;
+    int _oldHeightMeasureSpec;
+    
     int _minWidth;
     int _minHeight;
     
@@ -52,6 +74,9 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     int _userPaddingRightInitial;
     
     id  _viewExtension;
+    
+    
+    NSMutableDictionary<NSNumber*, NSNumber*>* _measureCache;
 }
 
 @end
@@ -76,6 +101,17 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     return [[LayoutParams alloc] initWithAttr:attr];
 }
 
+- (NSMutableDictionary<NSNumber*, NSNumber*>*)measureCache
+{
+    NSMutableDictionary<NSNumber*, NSNumber*>* mc = self.viewParams->_measureCache;
+    if(!mc)
+    {
+        mc = [NSMutableDictionary dictionary];
+        self.viewParams->_measureCache = mc;
+    }
+    return mc;
+}
+
 - (void)setViewAttr:(NSDictionary*)attr
 {
 #define if_match_key(x) if([(x) isEqualToString:key])
@@ -92,18 +128,18 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     
     int padding = -1;
     
-    int viewFlagValues = 0;
-    int viewFlagMasks = 0;
-    
-    BOOL setScrollContainer = NO;
+//    int viewFlagValues = 0;
+//    int viewFlagMasks = 0;
+//
+//    BOOL setScrollContainer = NO;
     
     int x = 0;
     int y = 0;
     
-    float tx = 0;
-    float ty = 0;
-    float tz = 0;
-    float elevation = 0;
+//    float tx = 0;
+//    float ty = 0;
+//    float tz = 0;
+//    float elevation = 0;
     float rotation = 0;
     float rotationX = 0;
     float rotationY = 0;
@@ -111,10 +147,10 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     float sy = 1.f;
     BOOL transformSet = NO;
     
-    int scrollbarStyle = VIEW_SCROLLBARS_INSIDE_OVERLAY;
-    int overScrollMode = self.viewParams->_overScrollMode;
-    BOOL initializeScrollbars = NO;
-    BOOL initializeScrollIndicators = NO;
+//    int scrollbarStyle = VIEW_SCROLLBARS_INSIDE_OVERLAY;
+//    int overScrollMode = self.viewParams->_overScrollMode;
+//    BOOL initializeScrollbars = NO;
+//    BOOL initializeScrollIndicators = NO;
     
     BOOL startPaddingDefined = NO;
     BOOL endPaddingDefined = NO;
@@ -661,9 +697,220 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     return self.viewParams->_baseline;
 }
 
++ (BOOL)isLayoutModeOptical:(UIView*)view
+{
+    return NO;
+}
+
 - (void)measure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec
 {
-    //TODO
+    BOOL optical = [UIView isLayoutModeOptical:self];
+    if (optical != [UIView isLayoutModeOptical:self.superview])
+    {
+        //TODO:
+//        Insets insets = getOpticalInsets();
+//        int oWidth  = insets.left + insets.right;
+//        int oHeight = insets.top  + insets.bottom;
+//        widthMeasureSpec  = MeasureSpec.adjust(widthMeasureSpec,  optical ? -oWidth  : oWidth);
+//        heightMeasureSpec = MeasureSpec.adjust(heightMeasureSpec, optical ? -oHeight : oHeight);
+    }
+    
+    long key = ((long)widthMeasureSpec << 32) | ((long) heightMeasureSpec & 0xffffffffL);
+    
+    ViewParams* viewParams = self.viewParams;
+    
+    BOOL forceLayout = (viewParams->_privateFlags & VIEW_PFLAG_FORCE_LAYOUT) == VIEW_PFLAG_FORCE_LAYOUT;
+
+    const BOOL specChanged = (widthMeasureSpec != viewParams->_oldWidthMeasureSpec)
+                         || (heightMeasureSpec != viewParams->_oldHeightMeasureSpec);
+    
+    const BOOL isSpecExactly = [MeasureSpec mode:widthMeasureSpec] == MeasureSpec_EXACTLY
+                           && [MeasureSpec mode:heightMeasureSpec] == MeasureSpec_EXACTLY;
+    
+    const BOOL matchesSpecSize = (viewParams->_measuredWidth == [MeasureSpec size:widthMeasureSpec])
+                                  && (viewParams->_measuredHeight == [MeasureSpec size:heightMeasureSpec]);
+                                  
+    const BOOL needsLayout = specChanged && (!isSpecExactly || !matchesSpecSize);
+    
+    
+    NSMutableDictionary<NSNumber*, NSNumber*>* measureCache = self.measureCache;
+    
+    if (forceLayout || needsLayout)
+    {
+        viewParams-> _privateFlags &= ~VIEW_PFLAG_MEASURED_DIMENSION_SET;
+        [self resolveRtlPropertiesIfNeeded];
+        
+        if (forceLayout || !measureCache[@(key)])
+        {
+            [self onMeasure:widthMeasureSpec heightSpec:heightMeasureSpec];
+            viewParams->_privateFlags3 &= ~VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;
+        }
+        else
+        {
+            long value = [measureCache[@(key)] longValue];
+            [self setMeasuredDimensionRaw:(int) (value >> 32) measuredHeight:(int)value & 0xFFFFFFFF];
+            viewParams->_privateFlags3 |= VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;
+        }
+        
+        if ((viewParams->_privateFlags & VIEW_PFLAG_MEASURED_DIMENSION_SET) != VIEW_PFLAG_MEASURED_DIMENSION_SET)
+        {
+            assert(0);//onMeasure did not set
+        }
+        viewParams->_privateFlags |= VIEW_PFLAG_LAYOUT_REQUIRED;
+    }
+    
+    viewParams->_oldWidthMeasureSpec  = widthMeasureSpec;
+    viewParams->_oldHeightMeasureSpec = heightMeasureSpec;
+    
+    long tMeasuredWidth  = (long)viewParams->_measuredWidth << 32;
+    long tMeasuredHeight = (long)viewParams->_measuredHeight & 0xffffffffL;
+    measureCache[@(key)] = @(tMeasuredWidth | tMeasuredHeight);
+}
+
+- (BOOL)resolveRtlPropertiesIfNeeded
+{
+    return NO;
+    //TODO:
+//    if (!needRtlPropertiesResolution()) return false;
+//    
+//    // Order is important here: LayoutDirection MUST be resolved first
+//    if (!isLayoutDirectionResolved()) {
+//        resolveLayoutDirection();
+//        resolveLayoutParams();
+//    }
+//    // ... then we can resolve the others properties depending on the resolved LayoutDirection.
+//    if (!isTextDirectionResolved()) {
+//        resolveTextDirection();
+//    }
+//    if (!isTextAlignmentResolved()) {
+//        resolveTextAlignment();
+//    }
+//    // Should resolve Drawables before Padding because we need the layout direction of the
+//    // Drawable to correctly resolve Padding.
+//    if (!areDrawablesResolved()) {
+//        resolveDrawables();
+//    }
+//    if (!isPaddingResolved()) {
+//        resolvePadding();
+//    }
+//    onRtlPropertiesChanged(getLayoutDirection());
+//    return true;
+}
+
+
+- (BOOL)measureHierarchy:(LayoutParams*)lp
+                   width:(int)desiredWindowWidth
+                  height:(int)desiredWindowHeight
+{
+    int childWidthMeasureSpec;
+    int childHeightMeasureSpec;
+    BOOL windowSizeMayChange = NO;
+    
+//    if (LayoutParams_WRAP_CONTENT == lp.width)
+//    {
+        childWidthMeasureSpec  = [self getRootMeasureSpec:desiredWindowWidth dimension:lp.width];
+        childHeightMeasureSpec = [self getRootMeasureSpec:desiredWindowHeight dimension:lp.height];
+        
+        [self performMeasure:childWidthMeasureSpec heightSpec:childHeightMeasureSpec];
+        
+        
+        if ((self.layoutParams.width != self.measuredWidth) || (self.layoutParams.height != self.measuredHeight))
+        {
+            windowSizeMayChange = YES;
+        }
+//    }
+    return windowSizeMayChange;
+}
+
+- (int)getRootMeasureSpec:(int)windowSize dimension:(int)rootDimension
+{
+    int measureSpec;
+    switch (rootDimension)
+    {
+        case LayoutParams_MATCH_PARENT:
+            measureSpec = [MeasureSpec makeMeasureSpec:windowSize mode:MeasureSpec_EXACTLY];
+            break;
+            
+        case LayoutParams_WRAP_CONTENT:
+            measureSpec = [MeasureSpec makeMeasureSpec:windowSize mode:MeasureSpec_AT_MOST];
+            break;
+            
+        default:
+            measureSpec = [MeasureSpec makeMeasureSpec:rootDimension mode:MeasureSpec_EXACTLY];
+            break;
+    }
+    return measureSpec;
+}
+
+- (void)performMeasure:(int)childWidthMeasureSpec heightSpec:(int)childHeightMeasureSpec
+{
+    [self measure:childWidthMeasureSpec heightSpec:childHeightMeasureSpec];
+}
+
+- (void)onMeasure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec
+{
+    int minimumWidth  = [self getSuggestedMinimumWidth];
+    int minimunHeight = [self getSuggestedMinimumHeight];
+    
+    int defaultWidth  = [self getDefaultSize:minimumWidth  measureSpec:widthMeasureSpec];
+    int defaultHeight = [self getDefaultSize:minimunHeight measureSpec:heightMeasureSpec];
+    
+    [self setMeasuredDimension:defaultWidth measuredHeight:defaultHeight];
+}
+
+- (int)getDefaultSize:(int)size measureSpec:(int)measureSpec
+{
+    int result = size;
+    int specMode = [MeasureSpec mode:measureSpec];
+    int specSize = [MeasureSpec size:measureSpec];
+    
+    switch (specMode) {
+        case MeasureSpec_UNSPECIFIED:
+            result = size;
+            break;
+        case MeasureSpec_AT_MOST:
+        case MeasureSpec_EXACTLY:
+            result = specSize;
+            break;
+    }
+    return result;
+}
+
+- (int)getSuggestedMinimumWidth
+{
+    return self.viewParams->_minWidth;
+    //TODO:
+    //return (mBackground == null) ? mMinWidth : max(mMinWidth, mBackground.getMinimumWidth());
+}
+
+- (int)getSuggestedMinimumHeight
+{
+    //TODO:
+    return self.viewParams->_minHeight;
+}
+
+- (void)setMeasuredDimension:(int)measuredWidth measuredHeight:(int)measuredHeight
+{
+    BOOL optical = [UIView isLayoutModeOptical:self];
+    if (optical != [UIView isLayoutModeOptical:self.superview])
+    {
+//        Insets insets = getOpticalInsets();
+//        int opticalWidth  = insets.left + insets.right;
+//        int opticalHeight = insets.top  + insets.bottom;
+//        
+//        measuredWidth  += optical ? opticalWidth  : -opticalWidth;
+//        measuredHeight += optical ? opticalHeight : -opticalHeight;
+    }
+    [self setMeasuredDimensionRaw:measuredWidth measuredHeight:measuredHeight];
+}
+
+- (void)setMeasuredDimensionRaw:(int)measuredWidth measuredHeight:(int)measuredHeight
+{
+    ViewParams* viewParams = self.viewParams;
+    viewParams->_measuredWidth = measuredWidth;
+    viewParams->_measuredHeight = measuredHeight;
+    
+    viewParams->_privateFlags |= VIEW_PFLAG_MEASURED_DIMENSION_SET;
 }
 
 @end

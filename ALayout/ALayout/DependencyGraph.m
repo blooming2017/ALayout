@@ -17,6 +17,8 @@
     if(self = [super init])
     {
         _view = view;
+        _dependents   = [NSMutableArray new];
+        _dependencies = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -114,7 +116,7 @@
         RelativeLayoutLayoutParams* layoutParams = (RelativeLayoutLayoutParams*)node.view.layoutParams;
         RelativeRule* rules = layoutParams.rules;
         
-        for (int j = 0; j < filterCount; j++)
+        for (int j = 0; j < filterCount && rules.count > 0; j++)
         {
             NSString* rule = rules[rulesFilter[j]];
             if (rule)
@@ -135,7 +137,7 @@
     for (int i = 0; i < count; i++)
     {
         DependencyGraph_Node* node = nodes[i];
-        if (node.dependencies.count == 0)
+        if (0 == node.dependencies.count)
         {
             [roots addObject:node];
         }

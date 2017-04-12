@@ -10,7 +10,7 @@
 
 @implementation MeasureSpec
 
-+ (int)getMode:(int)measureSpec
++ (int)mode:(int)measureSpec
 {
     return (measureSpec & MeasureSpec_MODE_MASK);
 }
@@ -20,7 +20,7 @@
     return (size & ~MeasureSpec_MODE_MASK) | (mode & MeasureSpec_MODE_MASK);
 }
 
-+ (int)getSize:(int)measureSpec
++ (int)size:(int)measureSpec
 {
     return (measureSpec & ~MeasureSpec_MODE_MASK);
 }
