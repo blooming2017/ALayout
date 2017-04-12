@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "LayoutDirection.h"
+#import "LayoutParams.h"
 
 @interface ViewParams : NSObject
 
@@ -23,14 +24,24 @@ typedef enum
 
 enum
 {
-    VIEW_LAYOUT_DIRECTION_UNDEFINED             = LayoutDirection_UNDEFINED,
-    VIEW_LAYOUT_DIRECTION_LTR                   = LayoutDirection_LTR,
-    VIEW_LAYOUT_DIRECTION_RTL                   = LayoutDirection_RTL,
-    VIEW_LAYOUT_DIRECTION_INHERIT               = LayoutDirection_INHERIT,
-    VIEW_LAYOUT_DIRECTION_LOCALE                = LayoutDirection_LOCALE,
-    VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT     = 2,
-    VIEW_PFLAG2_LAYOUT_DIRECTION_MASK           = 0x00000003 << VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT,
-    VIEW_PFLAG2_LAYOUT_DIRECTION_RESOLVED_RTL   = 4          << VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT
+    VIEW_LAYOUT_DIRECTION_UNDEFINED             =   LayoutDirection_UNDEFINED,
+    VIEW_LAYOUT_DIRECTION_LTR                   =   LayoutDirection_LTR,
+    VIEW_LAYOUT_DIRECTION_RTL                   =   LayoutDirection_RTL,
+    VIEW_LAYOUT_DIRECTION_INHERIT               =   LayoutDirection_INHERIT,
+    VIEW_LAYOUT_DIRECTION_LOCALE                =   LayoutDirection_LOCALE,
+    VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT     =   2,
+    VIEW_PFLAG2_LAYOUT_DIRECTION_MASK           =   0x00000003 << VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT,
+    VIEW_PFLAG2_LAYOUT_DIRECTION_RESOLVED_RTL   =   4          << VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT,
+    VIEW_PFLAG2_LAYOUT_DIRECTION_RESOLVED_MASK  =   0x0000000C << VIEW_PFLAG2_LAYOUT_DIRECTION_MASK_SHIFT
+};
+
+enum
+{
+    VIEW_OVER_SCROLL_ALWAYS = 0,
+
+    VIEW_OVER_SCROLL_IF_CONTENT_SCROLLS = 1,
+
+    VIEW_OVER_SCROLL_NEVER = 2
 };
 
 enum
@@ -46,6 +57,8 @@ enum
 - (ViewParams*)viewParams;
 
 - (void)setViewAttr:(NSDictionary*)attr;
+
+- (LayoutParams*)generateLayoutParams:(NSDictionary*)attr;
 
 - (VisibilityMode)visibility;
 

@@ -9,6 +9,7 @@
 #import "ALayout.h"
 #import "LayoutParams.h"
 #import "AttrKeyDef.h"
+#import "UIView+Params.h"
 
 static NSMutableDictionary* ViewClassRegisters = nil;
 
@@ -84,6 +85,7 @@ static Class viewClass(NSString* className)
     for(NSDictionary* attr in children)
     {
         UIView* view = [self parseView:attr];
+        view.layoutParams = [parent generateLayoutParams:attr];
         [parent addSubview:view];
     }
 }
