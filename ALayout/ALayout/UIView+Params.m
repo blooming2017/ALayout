@@ -36,6 +36,17 @@ enum
     VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT = 0x8
 };
 
+enum
+{
+    VIEW_MEASURED_SIZE_MASK = 0x00ffffff,
+    
+    VIEW_MEASURED_STATE_MASK = 0xff000000,
+
+    VIEW_MEASURED_HEIGHT_STATE_SHIFT = 16,
+
+    VIEW_MEASURED_STATE_TOO_SMALL = 0x01000000
+};
+
 static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     VIEW_LAYOUT_DIRECTION_LTR,
     VIEW_LAYOUT_DIRECTION_RTL,
@@ -67,6 +78,9 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     
     int _minWidth;
     int _minHeight;
+
+    CGRect _selfBounds;
+    CGRect _contentBounds;
     
     int _overScrollMode;
     
@@ -74,7 +88,6 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     int _userPaddingRightInitial;
     
     id  _viewExtension;
-    
     
     NSMutableDictionary<NSNumber*, NSNumber*>* _measureCache;
 }
@@ -675,6 +688,26 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     self.viewParams->_measuredHeight = measuredHeight;
 }
 
+- (CGRect)selfBounds
+{
+    return self.viewParams->_selfBounds;
+}
+
+- (void)setSelfBounds:(CGRect)selfBounds
+{
+    self.viewParams->_selfBounds = selfBounds;
+}
+
+- (CGRect)contentBounds
+{
+    return self.viewParams->_contentBounds;
+}
+
+- (void)setContentBounds:(CGRect)contentBounds
+{
+    self.viewParams->_contentBounds = contentBounds;
+}
+
 - (int)paddingLeft
 {
     return self.viewParams->_paddingLeft;
@@ -849,11 +882,8 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
 
 - (void)onMeasure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec
 {
-    int minimumWidth  = [self getSuggestedMinimumWidth];
-    int minimunHeight = [self getSuggestedMinimumHeight];
-    
-    int defaultWidth  = [self getDefaultSize:minimumWidth  measureSpec:widthMeasureSpec];
-    int defaultHeight = [self getDefaultSize:minimunHeight measureSpec:heightMeasureSpec];
+    int defaultWidth  = [self getDefaultSize:self.suggestedMinimumWidth  measureSpec:widthMeasureSpec];
+    int defaultHeight = [self getDefaultSize:self.suggestedMinimumHeight measureSpec:heightMeasureSpec];
     
     [self setMeasuredDimension:defaultWidth measuredHeight:defaultHeight];
 }
@@ -876,14 +906,14 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     return result;
 }
 
-- (int)getSuggestedMinimumWidth
+- (int)suggestedMinimumWidth
 {
     return self.viewParams->_minWidth;
     //TODO:
     //return (mBackground == null) ? mMinWidth : max(mMinWidth, mBackground.getMinimumWidth());
 }
 
-- (int)getSuggestedMinimumHeight
+- (int)suggestedMinimumHeight
 {
     //TODO:
     return self.viewParams->_minHeight;
@@ -911,6 +941,40 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     viewParams->_measuredHeight = measuredHeight;
     
     viewParams->_privateFlags |= VIEW_PFLAG_MEASURED_DIMENSION_SET;
+}
+
+- (int)resolveSize:(int)size measureSpec:(int)measureSpec
+{
+    return [self resolveSizeAndState:size measureSpec:measureSpec measuredState:0] & VIEW_MEASURED_SIZE_MASK;
+}
+
+- (int)resolveSizeAndState:(int)size measureSpec:(int)measureSpec measuredState:(int)childMeasuredState
+{
+    const int specMode = [MeasureSpec mode:measureSpec];
+    const int specSize = [MeasureSpec size:measureSpec];
+    int result;
+    switch (specMode)
+    {
+        case MeasureSpec_AT_MOST:
+            if (specSize < size)
+            {
+                result = specSize | VIEW_MEASURED_STATE_TOO_SMALL;
+            }
+            else
+            {
+                result = size;
+            }
+            break;
+            
+        case MeasureSpec_EXACTLY:
+            result = specSize;
+            break;
+            
+        case MeasureSpec_UNSPECIFIED:
+        default:
+            result = size;
+    }
+    return result | (childMeasuredState & VIEW_MEASURED_STATE_MASK);
 }
 
 @end

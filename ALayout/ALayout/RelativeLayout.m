@@ -250,7 +250,162 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
         }
     }
     
-    //TODO
+    UIView* baselineView = nil;
+    RelativeLayoutLayoutParams* baselineParams = nil;
+    
+    for (int i = 0; i < count; i++)
+    {
+        UIView* child = views[i];
+        if (Visibility_GONE != child.visibility)
+        {
+            RelativeLayoutLayoutParams* params = (RelativeLayoutLayoutParams*)child.layoutParams;
+            if (!baselineView || !baselineParams
+                || [self compareLayoutPosition:params layoutParams2: baselineParams] < 0)
+            {
+                baselineView = child;
+                baselineParams = params;
+            }
+        }
+    }
+    
+    //TODO:mBaselineView = baselineView;
+    
+    RelativeLayoutLayoutParams* layoutParams = (RelativeLayoutLayoutParams*)self.layoutParams;
+    if (isWrapContentWidth)
+    {
+        width += self.paddingRight;
+        
+        if (layoutParams.width >= 0)
+        {
+            width = MAX(width, layoutParams.width);
+        }
+        
+        width = MAX(width, self.suggestedMinimumWidth);
+        width = [self resolveSize:width measureSpec:widthMeasureSpec];
+        
+        if (offsetHorizontalAxis)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                UIView* child = views[i];
+                if (Visibility_GONE != child.visibility)
+                {
+                    RelativeLayoutLayoutParams* params = (RelativeLayoutLayoutParams*)child.layoutParams;
+                    RelativeRule* rules = [params getRules:layoutDirection];
+                    if (rules[@(RelativeLayout_CENTER_IN_PARENT)] || rules[@(RelativeLayout_CENTER_HORIZONTAL)])
+                    {
+                        [self centerHorizontal:child params:params myWidth:width];
+                    }
+                    else if (rules[@(RelativeLayout_ALIGN_PARENT_RIGHT)])
+                    {
+                        const int childWidth = child.measuredWidth;
+                        params.left = width - self.paddingRight - childWidth;
+                        params.right = params.left + childWidth;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (isWrapContentHeight)
+    {
+        height += self.paddingBottom;
+        
+        if (layoutParams.height >= 0)
+        {
+            height = MAX(height, layoutParams.height);
+        }
+        
+        height = MAX(height, self.suggestedMinimumHeight);
+        height = [self resolveSize:height measureSpec:heightMeasureSpec];
+        
+        if (offsetVerticalAxis)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                UIView* child = views[i];
+                if (Visibility_GONE != child.visibility)
+                {
+                    RelativeLayoutLayoutParams* params = (RelativeLayoutLayoutParams*)child.layoutParams;
+                    RelativeRule* rules = [params getRules:layoutDirection];
+                    if (rules[@(RelativeLayout_CENTER_IN_PARENT)] || rules[@(RelativeLayout_CENTER_VERTICAL)])
+                    {
+                        [self centerVertical:child params:params myHeight:height];
+                    }
+                    else if (rules[@(RelativeLayout_ALIGN_PARENT_BOTTOM)])
+                    {
+                        const int childHeight = child.measuredHeight;
+                        params.top = height - self.paddingBottom - childHeight;
+                        params.bottom = params.top + childHeight;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (horizontalGravity || verticalGravity)
+    {
+        CGRect selfBounds;
+        selfBounds.origin.x = self.paddingLeft;
+        selfBounds.origin.y = self.paddingTop;
+        selfBounds.size.width = width - self.paddingRight;
+        selfBounds.size.height = height - self.paddingBottom;
+        
+        CGRect contentBounds = self.contentBounds;
+        [Gravity apply:_gravity w:(right-left) h:(bottom-top) container:contentBounds outRect:&selfBounds layoutDirection:layoutDirection];
+        self.selfBounds = selfBounds;
+        
+        const int horizontalOffset = contentBounds.origin.x - left;
+        const int verticalOffset = contentBounds.origin.y - top;
+        if (0 != horizontalOffset || 0 != verticalOffset)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                UIView* child = views[i];
+                if (Visibility_GONE != child.visibility && child != ignore)
+                {
+                    RelativeLayoutLayoutParams* params = (RelativeLayoutLayoutParams*)child.layoutParams;
+                    if (horizontalGravity)
+                    {
+                        params.left += horizontalOffset;
+                        params.right += horizontalOffset;
+                    }
+                    if (verticalGravity)
+                    {
+                        params.top += verticalOffset;
+                        params.bottom += verticalOffset;
+                    }
+                }
+            }
+        }
+    }
+    
+    if ([self isLayoutRtl])
+    {
+        const int offsetWidth = myWidth - width;
+        for (int i = 0; i < count; i++)
+        {
+            UIView* child = views[i];
+            if (Visibility_GONE != child.visibility)
+            {
+                RelativeLayoutLayoutParams* params = (RelativeLayoutLayoutParams*)child.layoutParams;
+                params.left -= offsetWidth;
+                params.right -= offsetWidth;
+            }
+        }
+    }
+    
+    [self setMeasuredDimension:width measuredHeight:height];
+}
+
+- (int)compareLayoutPosition:(RelativeLayoutLayoutParams*)p1 layoutParams2:(RelativeLayoutLayoutParams*) p2
+{
+    int topDiff = p1.top - p2.top;
+    if (topDiff != 0)
+    {
+        return topDiff;
+    }
+    return p1.left - p2.left;
 }
 
 - (BOOL)positionChildHorizontal:(UIView*)child

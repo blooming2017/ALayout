@@ -52,6 +52,9 @@ enum
 @property (nonatomic) int measuredWidth;
 @property (nonatomic) int measuredHeight;
 
+@property (nonatomic) CGRect selfBounds;
+@property (nonatomic) CGRect contentBounds;
+
 - (ViewParams*)viewParams;
 
 - (void)setViewAttr:(NSDictionary*)attr;
@@ -74,6 +77,14 @@ enum
 - (int)paddingBottom;
 
 - (int)baseline;
+
+- (int)suggestedMinimumWidth;
+
+- (int)suggestedMinimumHeight;
+
+- (int)resolveSize:(int)size measureSpec:(int)measureSpec;
+
+- (void)setMeasuredDimension:(int)measuredWidth measuredHeight:(int)measuredHeight;
 
 //
 - (void)measure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec;
