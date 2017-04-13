@@ -99,7 +99,7 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
         _sortedHorizontalChildren = [NSMutableArray array];
     }
     
-    DependencyGraph* graph = [[DependencyGraph alloc] init];
+    DependencyGraph* graph = _graph;
     
     for (int i = 0; i < count; i++)
     {
@@ -479,7 +479,6 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
                      myHeight:(int)myHeight
                          wrap:(BOOL)wrapContent
 {
-    
     RelativeRule* rules = [params getRules];
     
     if (RelativeLayout_VALUE_NOT_SET == params.top && RelativeLayout_VALUE_NOT_SET != params.bottom)
@@ -489,7 +488,8 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     else if (RelativeLayout_VALUE_NOT_SET != params.top && RelativeLayout_VALUE_NOT_SET == params.bottom)
     {
         params.bottom = params.top + child.measuredHeight;
-    } else if (RelativeLayout_VALUE_NOT_SET == params.top && RelativeLayout_VALUE_NOT_SET == params.bottom)
+    }
+    else if (RelativeLayout_VALUE_NOT_SET == params.top && RelativeLayout_VALUE_NOT_SET == params.bottom)
     {
         if (rules[@(RelativeLayout_CENTER_IN_PARENT)] || rules[@(Gravity_CENTER_VERTICAL)]) {
             if (!wrapContent)
@@ -822,7 +822,8 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     {
         childSpecMode = isUnspecified ? MeasureSpec_UNSPECIFIED : MeasureSpec_EXACTLY;
         childSpecSize = MAX(0, maxAvailable);
-    } else
+    }
+    else
     {
         if (childSize >= 0)
         {
@@ -859,6 +860,22 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     }
     
     return [MeasureSpec makeMeasureSpec:childSpecSize mode:childSpecMode];
+}
+
+- (void)onLayout:(BOOL)changed left:(int)left top:(int)top right:(int)right bottom:(int)bottom
+{
+    NSArray<UIView*>* subviews = self.subviews;
+    int count = (int)subviews.count;
+    
+    for (int i = 0; i < count; i++)
+    {
+        UIView* child = subviews[i];
+        if (Visibility_GONE != child.visibility)
+        {
+            RelativeLayoutLayoutParams* st = (RelativeLayoutLayoutParams*)child.layoutParams;
+            [child layout:st.left t:st.top r:st.right b:st.bottom];
+        }
+    }
 }
 
 @end

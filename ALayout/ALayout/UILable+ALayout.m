@@ -20,6 +20,8 @@ RegisterView(TextView)
 #define if_match_key(x) if([(x) isEqualToString:key])
 #define elif_match_key(x) else if([(x) isEqualToString:key])
     
+    [super parseAttr:attr];
+    
     for(NSString* key in attr)
     {
         if_match_key(TextView_editable)

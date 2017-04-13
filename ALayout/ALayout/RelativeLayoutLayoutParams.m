@@ -17,7 +17,7 @@
     if(self = [super initWithAttr:attr])
     {
         _rules = [NSMutableDictionary dictionary];
-        
+        _needsLayoutResolution = YES;
         [self parseAttr:attr];
     }
     return self;

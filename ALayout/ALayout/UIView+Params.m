@@ -27,12 +27,15 @@ enum
 
 enum
 {
+    VIEW_PFLAG_HAS_BOUNDS               = 0x00000010,
+    VIEW_PFLAG_DRAWN                    = 0x00000020,
     VIEW_PFLAG_FORCE_LAYOUT             = 0x00001000,
     VIEW_PFLAG_LAYOUT_REQUIRED          = 0x00002000
 };
 
 enum
 {
+    VIEW_PFLAG3_IS_LAID_OUT                  = 0x4,
     VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT = 0x8
 };
 
@@ -88,6 +91,11 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     int _userPaddingRightInitial;
     
     id  _viewExtension;
+    
+    int _left;
+    int _right;
+    int _top;
+    int _bottom;
     
     NSMutableDictionary<NSNumber*, NSNumber*>* _measureCache;
 }
@@ -1001,6 +1009,126 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
             result = size;
     }
     return result | (childMeasuredState & VIEW_MEASURED_STATE_MASK);
+}
+
+- (void)onLayout:(BOOL)changed left:(int)left top:(int)top right:(int)right bottom:(int)bottom
+{
+    
+}
+
+- (void)layout:(int)l t:(int)t r:(int)r b:(int)b
+{
+    ViewParams* viewParams = self.viewParams;
+    if(self.viewParams->_privateFlags3 & VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT)
+    {
+        [self onMeasure:self.viewParams->_oldWidthMeasureSpec heightSpec:viewParams->_oldHeightMeasureSpec];
+        viewParams->_privateFlags3 &= ~VIEW_PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;
+    }
+    
+    BOOL changed = [self setLayoutedFrame:l top:t right:r bottom:b];
+    
+    if (changed || (viewParams->_privateFlags & VIEW_PFLAG_LAYOUT_REQUIRED) == VIEW_PFLAG_LAYOUT_REQUIRED)
+    {
+        [self onLayout:changed left:l top:t right:r bottom:b];
+        viewParams->_privateFlags &= ~VIEW_PFLAG_LAYOUT_REQUIRED;
+    }
+    
+    viewParams->_privateFlags &= ~VIEW_PFLAG_FORCE_LAYOUT;
+    viewParams->_privateFlags3 |= VIEW_PFLAG3_IS_LAID_OUT;
+}
+
+- (BOOL)setLayoutedFrame:(int)left top:(int)top right:(int)right bottom:(int)bottom
+{
+    BOOL changed = NO;
+    ViewParams* viewParams = self.viewParams;
+    
+    if (viewParams->_left != left || viewParams->_right != right || viewParams->_top != top || viewParams->_bottom != bottom)
+    {
+        changed = true;
+        int drawn = viewParams->_privateFlags & VIEW_PFLAG_DRAWN;
+        
+        int oldWidth = viewParams->_right - viewParams->_left;
+        int oldHeight = viewParams->_bottom - viewParams->_top;
+        int newWidth = right - left;
+        int newHeight = bottom - top;
+        BOOL sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
+        
+        
+        viewParams->_left = left;
+        viewParams->_top = top;
+        viewParams->_right = right;
+        viewParams->_bottom = bottom;
+        
+        CGRect rect = CGRectMake(left, top, right-left, bottom-top);
+        self.frame = rect;
+        
+        viewParams->_privateFlags |= VIEW_PFLAG_HAS_BOUNDS;
+        
+        // Reset drawn bit to original value (invalidate turns it off)
+        viewParams->_privateFlags |= drawn;
+    }
+    return changed;
+}
+
+-(void)performLayout:(LayoutParams*)lp desiredWidth:(int)desiredWindowWidth desiredHeight:(int)desiredWindowHeight
+{
+    UIView* host = self;
+
+    [host layout:0 t:0 r:host.measuredWidth b:host.measuredHeight];
+        
+//        mInLayout = false;
+//        int numViewsRequestingLayout = mLayoutRequesters.size();
+//        if (numViewsRequestingLayout > 0)
+//        {
+//            // requestLayout() was called during layout.
+//            // If no layout-request flags are set on the requesting views, there is no problem.
+//            // If some requests are still pending, then we need to clear those flags and do
+//            // a full request/measure/layout pass to handle this situation.
+//            ArrayList<View> validLayoutRequesters = getValidLayoutRequesters(mLayoutRequesters,
+//                                                                             false);
+//            if (validLayoutRequesters != null) {
+//                // Set this flag to indicate that any further requests are happening during
+//                // the second pass, which may result in posting those requests to the next
+//                // frame instead
+//                mHandlingLayoutInLayoutRequest = true;
+//                
+//                // Process fresh layout requests, then measure and layout
+//                int numValidRequests = validLayoutRequesters.size();
+//                for (int i = 0; i < numValidRequests; ++i) {
+//                    final View view = validLayoutRequesters.get(i);
+//                    Log.w("View", "requestLayout() improperly called by " + view +
+//                          " during layout: running second layout pass");
+//                    view.requestLayout();
+//                }
+//                measureHierarchy(host, lp, mView.getContext().getResources(),
+//                                 desiredWindowWidth, desiredWindowHeight);
+//                mInLayout = true;
+//                host.layout(0, 0, host.getMeasuredWidth(), host.getMeasuredHeight());
+//                
+//                mHandlingLayoutInLayoutRequest = false;
+//                
+//                // Check the valid requests again, this time without checking/clearing the
+//                // layout flags, since requests happening during the second pass get noop'd
+//                validLayoutRequesters = getValidLayoutRequesters(mLayoutRequesters, true);
+//                if (validLayoutRequesters != null) {
+//                    final ArrayList<View> finalRequesters = validLayoutRequesters;
+//                    // Post second-pass requests to the next frame
+//                    getRunQueue().post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            int numValidRequests = finalRequesters.size();
+//                            for (int i = 0; i < numValidRequests; ++i) {
+//                                final View view = finalRequesters.get(i);
+//                                Log.w("View", "requestLayout() improperly called by " + view +
+//                                      " during second layout pass: posting in next frame");
+//                                view.requestLayout();
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//            
+//        }
 }
 
 @end

@@ -88,6 +88,8 @@ enum
 
 - (void)setMeasuredDimension:(int)measuredWidth measuredHeight:(int)measuredHeight;
 
+- (void)layout:(int)l t:(int)t r:(int)r b:(int)b;
+
 //
 - (void)measure:(int)widthMeasureSpec heightSpec:(int)heightMeasureSpec;
 
@@ -95,5 +97,8 @@ enum
                    width:(int)desiredWindowWidth
                   height:(int)desiredWindowHeight;
 
+-(void)performLayout:(LayoutParams*)lp
+        desiredWidth:(int)desiredWindowWidth
+       desiredHeight:(int)desiredWindowHeight;
 @end
 
