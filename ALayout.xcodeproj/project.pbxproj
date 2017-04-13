@@ -30,6 +30,7 @@
 		28FE72F91E9C756D00894E20 /* RelativeLayoutLayoutParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72F81E9C756D00894E20 /* RelativeLayoutLayoutParams.m */; };
 		28FE72FC1E9CDE6000894E20 /* RelativeLayout+ALayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72FB1E9CDE6000894E20 /* RelativeLayout+ALayout.m */; };
 		28FE72FF1E9CE0C400894E20 /* UILable+ALayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FE72FE1E9CE0C400894E20 /* UILable+ALayout.m */; };
+		28FE73011E9F93F100894E20 /* alayout.xml in Resources */ = {isa = PBXBuildFile; fileRef = 28FE73001E9F93F100894E20 /* alayout.xml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,7 @@
 		28FE72FB1E9CDE6000894E20 /* RelativeLayout+ALayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RelativeLayout+ALayout.m"; sourceTree = "<group>"; };
 		28FE72FD1E9CE0C400894E20 /* UILable+ALayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILable+ALayout.h"; sourceTree = "<group>"; };
 		28FE72FE1E9CE0C400894E20 /* UILable+ALayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILable+ALayout.m"; sourceTree = "<group>"; };
+		28FE73001E9F93F100894E20 /* alayout.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = alayout.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 				28FE72CA1E9B982A00894E20 /* ViewController.h */,
 				28FE72CB1E9B982A00894E20 /* ViewController.m */,
 				28FE72CE1E9B982A00894E20 /* XMLSupport */,
+				28FE73001E9F93F100894E20 /* alayout.xml */,
 			);
 			path = ALayout;
 			sourceTree = "<group>";
@@ -242,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28FE72DA1E9B982A00894E20 /* Main.storyboard in Resources */,
+				28FE73011E9F93F100894E20 /* alayout.xml in Resources */,
 				28FE72D81E9B982A00894E20 /* Assets.xcassets in Resources */,
 				28FE72D91E9B982A00894E20 /* LaunchScreen.storyboard in Resources */,
 			);

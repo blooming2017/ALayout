@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.bell.myapplication.MainActivity">
+    
+    <TextView
+    android:id="@+id/id1111"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="100px"
+    android:layout_marginLeft="50px"
+    android:layout_marginRight="80px"
+    android:lines="1"
+    android:text="asdfsd111111113333333333323423423423423423423423433333" />
+    
+    <TextView
+    
+    android:id="@+id/id2222"
+    android:layout_below="@id/id1111"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="10px"
+    android:text="ieoiioewo" />
+    
+    <TextView
+    android:layout_below="@+id/id2222"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignLeft="@id/id2222"
+    android:text="awefawef" />
+</RelativeLayout>

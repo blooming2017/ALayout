@@ -22,6 +22,8 @@ RegisterView(TextView)
     
     [super parseAttr:attr];
     
+    self.numberOfLines = 0;
+    
     for(NSString* key in attr)
     {
         if_match_key(TextView_editable)
@@ -90,6 +92,7 @@ RegisterView(TextView)
         }
         elif_match_key(TextView_maxLines)
         {
+            self.numberOfLines = getParamsInt(attr[key], 1);
             //setMaxLines(a.getInt(attr, -1));
         }
         elif_match_key(TextView_maxHeight)
@@ -98,6 +101,7 @@ RegisterView(TextView)
         }
         elif_match_key(TextView_lines)
         {
+            self.numberOfLines = getParamsInt(attr[key], 0);
             //setLines(a.getInt(attr, -1));
         }
         elif_match_key(TextView_height)
@@ -153,7 +157,7 @@ RegisterView(TextView)
         }
         elif_match_key(TextView_singleLine)
         {
-            //singleLine = a.getBoolean(attr, singleLine);
+            self.numberOfLines = getBool(attr[key], YES) ? 1 : 0;
         }
         elif_match_key(TextView_ellipsize)
         {
@@ -367,6 +371,8 @@ RegisterView(TextView)
     
     CGRect rect;
     
+    int options = 0;
+    
     if (MeasureSpec_EXACTLY == widthMode)
     {
         width = widthSize;
@@ -385,7 +391,8 @@ RegisterView(TextView)
         }
         else
         {
-            rect = [self.text boundingRectWithSize:CGSizeMake(widthSize, MAXFLOAT) options:0 attributes:@{NSFontAttributeName:self.font} context:nil];
+            options = NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading;
+            rect = [self.text boundingRectWithSize:CGSizeMake(widthSize, MAXFLOAT) options:options attributes:@{NSFontAttributeName:self.font} context:nil];
             width = ceil(rect.size.width) + self.paddingLeft + self.paddingRight;
             if (MeasureSpec_AT_MOST == widthMode)
             {
@@ -406,12 +413,12 @@ RegisterView(TextView)
     }
     else
     {
-        rect = [self.text boundingRectWithSize:CGSizeMake(width, MAXFLOAT) options:0 attributes:@{NSFontAttributeName:self.font} context:nil];
-        height = rect.size.height;
+        rect = [self.text boundingRectWithSize:CGSizeMake(width, MAXFLOAT) options:options attributes:@{NSFontAttributeName:self.font} context:nil];
+        height = ceil(rect.size.height);
         
         if (MeasureSpec_AT_MOST == heightMode)
         {
-            height = MIN(height, heightSize);
+            height = MIN(ceil(height), heightSize);
         }
     }
     

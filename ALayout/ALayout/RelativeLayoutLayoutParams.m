@@ -230,4 +230,14 @@
     _needsLayoutResolution = NO;
 }
 
+- (void)setLeft:(int)left
+{
+    _left = left;
+    if(left < 0)
+    {
+        NSLog(@"asf");
+    }
+    NSLog(@"left=%d", left);
+}
+
 @end
