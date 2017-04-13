@@ -14,9 +14,4 @@
 
 RegisterView(view);
 
-- (void)parseAttr:(NSDictionary*)attr
-{
-    [self setViewAttr:attr];
-}
-
 @end

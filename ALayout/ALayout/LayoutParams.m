@@ -141,3 +141,8 @@ int getDimensionPixelOffset(id value, int defaultValue)
     return getDimensionPixelSize(value, defaultValue);
 }
 
+NSString* getParamsText(id value, NSString* defaultValue)
+{
+    return (NSString*)value ?: defaultValue;
+}
+

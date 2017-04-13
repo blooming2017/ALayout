@@ -10,6 +10,7 @@
 #import "LayoutDirection.h"
 #import "LayoutParams.h"
 
+
 @interface ViewParams : NSObject
 
 @end
@@ -52,12 +53,13 @@ enum
 @property (nonatomic) int measuredWidth;
 @property (nonatomic) int measuredHeight;
 
+@property (nonatomic) int minWidth;
+@property (nonatomic) int minHeight;
+
 @property (nonatomic) CGRect selfBounds;
 @property (nonatomic) CGRect contentBounds;
 
 - (ViewParams*)viewParams;
-
-- (void)setViewAttr:(NSDictionary*)attr;
 
 - (LayoutParams*)generateLayoutParams:(NSDictionary*)attr;
 

@@ -125,7 +125,7 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     return mc;
 }
 
-- (void)setViewAttr:(NSDictionary*)attr
+- (void)parseAttr:(NSDictionary*)attr
 {
 #define if_match_key(x) if([(x) isEqualToString:key])
 #define elif_match_key(x) else if([(x) isEqualToString:key])
@@ -919,6 +919,26 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     return self.viewParams->_minHeight;
 }
 
+- (int)minWidth
+{
+    return self.viewParams->_minWidth;
+}
+
+- (int)minHeight
+{
+    return self.viewParams->_minHeight;
+}
+
+- (void)setMinWidth:(int)minWidth
+{
+    self.viewParams->_minWidth = minWidth;
+}
+
+- (void)setMinHeight:(int)minHeight
+{
+    self.viewParams->_minHeight = minHeight;
+}
+
 - (void)setMeasuredDimension:(int)measuredWidth measuredHeight:(int)measuredHeight
 {
     BOOL optical = [UIView isLayoutModeOptical:self];
@@ -941,6 +961,12 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     viewParams->_measuredHeight = measuredHeight;
     
     viewParams->_privateFlags |= VIEW_PFLAG_MEASURED_DIMENSION_SET;
+    NSLog(@"%p setMeasuredDimensionRaw:(%@,%@)", self, @(measuredWidth), @(measuredHeight));
+    
+    CGRect rect = self.frame;
+    rect.size.width = measuredWidth;
+    rect.size.height = measuredHeight;
+    self.frame = rect;
 }
 
 - (int)resolveSize:(int)size measureSpec:(int)measureSpec
