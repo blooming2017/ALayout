@@ -491,7 +491,8 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     }
     else if (RelativeLayout_VALUE_NOT_SET == params.top && RelativeLayout_VALUE_NOT_SET == params.bottom)
     {
-        if (rules[@(RelativeLayout_CENTER_IN_PARENT)] || rules[@(Gravity_CENTER_VERTICAL)]) {
+        if (rules[@(RelativeLayout_CENTER_IN_PARENT)] || rules[@(Gravity_CENTER_VERTICAL)])
+        {
             if (!wrapContent)
             {
                 [self centerVertical:child params:params myHeight:myHeight];
@@ -509,14 +510,12 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
             params.bottom = params.top + child.measuredHeight;
         }
     }
-    return rules[@(RelativeLayout_ALIGN_PARENT_BOTTOM)];
+    return !!rules[@(RelativeLayout_ALIGN_PARENT_BOTTOM)];
 }
 
 - (void)measureChild:(UIView*)child params:(RelativeLayoutLayoutParams*)params myWidth:(int)myWidth myHeight:(int)myHeight
 {
     int childWidthMeasureSpec = [self getChildMeasureSpec:params.left childEnd:params.right childSize:params.width startMargin:params.leftMargin endMargin:params.rightMargin startPadding:self.paddingLeft endPadding:self.paddingRight mySize:myWidth];
-    
-    
     
     int childHeightMeasureSpec = [self getChildMeasureSpec:params.top childEnd:params.bottom childSize:params.height startMargin:params.topMargin endMargin:params.bottomMargin startPadding:self.paddingTop endPadding:self.paddingBottom mySize:myHeight];
     
