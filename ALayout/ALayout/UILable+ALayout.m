@@ -92,7 +92,6 @@ RegisterView(TextView)
         }
         elif_match_key(TextView_maxLines)
         {
-            self.numberOfLines = getParamsInt(attr[key], 1);
             //setMaxLines(a.getInt(attr, -1));
         }
         elif_match_key(TextView_maxHeight)
@@ -373,6 +372,11 @@ RegisterView(TextView)
     
     int options = 0;
     
+    if(1 != self.numberOfLines)
+    {
+        options = NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading;
+    }
+    
     if (MeasureSpec_EXACTLY == widthMode)
     {
         width = widthSize;
@@ -391,7 +395,6 @@ RegisterView(TextView)
         }
         else
         {
-            options = NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading;
             rect = [self.text boundingRectWithSize:CGSizeMake(widthSize, MAXFLOAT) options:options attributes:@{NSFontAttributeName:self.font} context:nil];
             width = ceil(rect.size.width) + self.paddingLeft + self.paddingRight;
             if (MeasureSpec_AT_MOST == widthMode)

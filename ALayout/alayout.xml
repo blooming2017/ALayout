@@ -2,8 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     tools:context="com.example.bell.myapplication.MainActivity">
     
     <TextView
@@ -13,8 +11,8 @@
     android:layout_marginTop="100px"
     android:layout_marginLeft="50px"
     android:layout_marginRight="80px"
-    android:lines="1"
-    android:text="asdfsd111111113333333333323423423423423423423423433333" />
+    android:lines="2"
+    android:text="asdfsd11111111333333333332342342111111113333333333323423421111111133333333333234234211111111333333333332342342111111113333333333323423423423423423423423433333" />
     
     <TextView
     

@@ -419,7 +419,7 @@ static NSArray<NSNumber*>* RULES_HORIZONTAL;
     
     if ((RelativeLayout_VALUE_NOT_SET == params.left) && (RelativeLayout_VALUE_NOT_SET != params.right))
     {
-        params.left = params.left - child.measuredWidth;
+        params.left = params.right - child.measuredWidth;
     }
     else if (RelativeLayout_VALUE_NOT_SET != params.left && RelativeLayout_VALUE_NOT_SET == params.right)
     {
