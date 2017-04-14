@@ -21,7 +21,6 @@ typedef NSMutableDictionary<NSNumber*, NSString*> RelativeRule;
 
 @property (nonatomic) BOOL needsLayoutResolution;
 @property (nonatomic) BOOL rulesChanged;
-@property (nonatomic) BOOL isRtlCompatibilityMode;
 @property (nonatomic) BOOL alignWithParent;
 
 

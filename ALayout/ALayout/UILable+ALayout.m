@@ -404,11 +404,11 @@ RegisterView(TextView)
         }
     }
     
-    int want = width - self.paddingLeft - self.paddingRight;
-    int unpaddedWidth = want;
+    //int want = width - self.paddingLeft - self.paddingRight;
+    //int unpaddedWidth = want;
 
-    int hintWant = want;
-    int hintWidth = hintWant;
+    //int hintWant = want;
+    //int hintWidth = hintWant;
     
     if (MeasureSpec_EXACTLY == heightMode)
     {

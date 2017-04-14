@@ -18,6 +18,8 @@ enum
 
 - (instancetype)initWithAttr:(NSDictionary*)attr;
 
+- (instancetype)initWithWidth:(int)width height:(int)height;
+
 @property (nonatomic) int width;
 @property (nonatomic) int height;
 

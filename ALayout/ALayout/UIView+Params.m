@@ -41,13 +41,25 @@ enum
 
 enum
 {
-    VIEW_MEASURED_SIZE_MASK = 0x00ffffff,
-    
-    VIEW_MEASURED_STATE_MASK = 0xff000000,
+    VIEW_MEASURED_SIZE_MASK             = 0x00ffffff,
+    VIEW_MEASURED_STATE_MASK            = 0xff000000,
+    VIEW_MEASURED_HEIGHT_STATE_SHIFT    = 16,
+    VIEW_MEASURED_STATE_TOO_SMALL       = 0x01000000
+};
 
-    VIEW_MEASURED_HEIGHT_STATE_SHIFT = 16,
+enum
+{
+    VIEW_SCROLLBARS_HORIZONTAL = 0x00000100,
+    VIEW_SCROLLBARS_VERTICAL   = 0x00000200,
+    VIEW_SCROLLBARS_MASK       = 0x00000300,
+    VIEW_SCROLLBARS_INSET_MASK = 0x01000000
+};
 
-    VIEW_MEASURED_STATE_TOO_SMALL = 0x01000000
+enum
+{
+    VIEW_SCROLLBAR_POSITION_DEFAULT = 0,
+    VIEW_SCROLLBAR_POSITION_LEFT    = 1,
+    VIEW_SCROLLBAR_POSITION_RIGHT   = 2
 };
 
 static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
@@ -66,10 +78,25 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     int _privateFlags2;
     int _privateFlags3;
     
+    int _paddingStart;
+    int _paddingEnd;
     int _paddingLeft;
     int _paddingRight;
     int _paddingTop;
     int _paddingBottom;
+    
+    int _userPaddingLeftInitial;
+    int _userPaddingRightInitial;
+    
+    int _userPaddingLeft;
+    int _userPaddingRight;
+    int _userPaddingTop;
+    int _userPaddingBottom;
+    int _userPaddingStart;
+    int _userPaddingEnd;
+    
+    BOOL _leftPaddingDefined;
+    BOOL _rightPaddingDefined;
     
     int _baseline;
     
@@ -86,16 +113,16 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     CGRect _contentBounds;
     
     int _overScrollMode;
-    
-    int _userPaddingLeftInitial;
-    int _userPaddingRightInitial;
-    
+    int _verticalScrollbarPosition;
+
     id  _viewExtension;
     
     int _left;
     int _right;
     int _top;
     int _bottom;
+    
+    int _viewFlags;
     
     NSMutableDictionary<NSNumber*, NSNumber*>* _measureCache;
 }
@@ -515,7 +542,7 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
         }
         elif_match_key(View_verticalScrollbarPosition)
         {
-            //mVerticalScrollbarPosition = a.getInt(attr, SCROLLBAR_POSITION_DEFAULT);
+            viewParams->_verticalScrollbarPosition = getParamsInt(attr[key], VIEW_SCROLLBAR_POSITION_DEFAULT);
         }
         elif_match_key(View_layerType)
         {
@@ -646,6 +673,64 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
 //            }
         }
     }
+    
+    viewParams->_userPaddingStart = startPadding;
+    viewParams->_userPaddingEnd = endPadding;
+    
+    viewParams->_leftPaddingDefined  = leftPaddingDefined;
+    viewParams->_rightPaddingDefined = rightPaddingDefined;
+    
+    if (padding >= 0)
+    {
+        leftPadding = padding;
+        topPadding = padding;
+        rightPadding = padding;
+        bottomPadding = padding;
+        viewParams->_userPaddingLeftInitial = padding;
+        viewParams->_userPaddingRightInitial = padding;
+    }
+    
+    const BOOL hasRelativePadding = startPaddingDefined || endPaddingDefined;
+    
+    if (viewParams->_leftPaddingDefined && !hasRelativePadding)
+    {
+        viewParams->_userPaddingLeftInitial = leftPadding;
+    }
+    if (viewParams->_rightPaddingDefined && !hasRelativePadding)
+    {
+        viewParams->_userPaddingRightInitial = rightPadding;
+    }
+    
+    [self internalSetPadding:viewParams->_userPaddingLeftInitial
+                         top:(topPadding >= 0 ? topPadding : viewParams->_paddingTop)
+                       right:viewParams->_userPaddingRightInitial
+                      bottom:(bottomPadding >= 0 ? bottomPadding : viewParams->_paddingBottom)];
+    
+//    if (viewFlagMasks != 0)
+//    {
+//        setFlags(viewFlagValues, viewFlagMasks);
+//    }
+//    
+//    if (initializeScrollbars)
+//    {
+//        initializeScrollbarsInternal(a);
+//    }
+//    
+//    if (initializeScrollIndicators)
+//    {
+//        initializeScrollIndicatorsInternal();
+//    }
+//    
+//    
+//    // Needs to be called after mViewFlags is set
+//    if (scrollbarStyle != SCROLLBARS_INSIDE_OVERLAY) {
+//        recomputePadding();
+//    }
+//    
+//    if (x != 0 || y != 0)
+//    {
+//        scrollTo(x, y);
+//    }
 }
 
 
@@ -716,21 +801,47 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
     self.viewParams->_contentBounds = contentBounds;
 }
 
+- (BOOL)isPaddingResolved
+{
+    return (self.viewParams->_privateFlags2 & VIEW_PFLAG2_PADDING_RESOLVED) == VIEW_PFLAG2_PADDING_RESOLVED;
+}
+
 - (int)paddingLeft
 {
+    if(!self.isPaddingResolved)
+    {
+        [self resolvePadding];
+    }
     return self.viewParams->_paddingLeft;
 }
+
 - (int)paddingRight
 {
+    if(!self.isPaddingResolved)
+    {
+        [self resolvePadding];
+    }
     return self.viewParams->_paddingRight;
 }
+
 - (int)paddingTop
 {
     return self.viewParams->_paddingTop;
 }
+
 - (int)paddingBottom
 {
     return self.viewParams->_paddingBottom;
+}
+
+- (int)paddingStart
+{
+    return VIEW_LAYOUT_DIRECTION_RTL == self.layoutDirection ? self.paddingRight : self.paddingLeft;
+}
+
+- (int)paddingEnd
+{
+    return VIEW_LAYOUT_DIRECTION_RTL == self.layoutDirection ? self.paddingLeft  : self.paddingRight;
 }
 
 - (int)baseline
@@ -1052,7 +1163,7 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
         int newWidth = right - left;
         int newHeight = bottom - top;
         BOOL sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
-        
+        (void)sizeChanged;
         
         viewParams->_left = left;
         viewParams->_top = top;
@@ -1129,6 +1240,162 @@ static int VIEW_LAYOUT_DIRECTION_FLAGS[] = {
 //            }
 //            
 //        }
+}
+
+
+- (void)resolvePadding
+{
+    const int resolvedLayoutDirection = self.layoutDirection;
+    
+//    if (mBackground != null && (!mLeftPaddingDefined || !mRightPaddingDefined))
+//    {
+//        Rect padding = sThreadLocal.get();
+//        if (padding == null) {
+//            padding = new Rect();
+//            sThreadLocal.set(padding);
+//        }
+//        mBackground.getPadding(padding);
+//        if (!mLeftPaddingDefined) {
+//            mUserPaddingLeftInitial = padding.left;
+//        }
+//        if (!mRightPaddingDefined) {
+//            mUserPaddingRightInitial = padding.right;
+//        }
+//    }
+    
+    ViewParams* viewParams = self.viewParams;
+    switch (resolvedLayoutDirection)
+    {
+        case VIEW_LAYOUT_DIRECTION_RTL:
+            if (viewParams->_userPaddingStart != VIEW_UNDEFINED_PADDING)
+            {
+                viewParams->_userPaddingRight = viewParams->_userPaddingStart;
+            }
+            else
+            {
+                viewParams->_userPaddingRight = viewParams->_userPaddingRightInitial;
+            }
+            if (viewParams->_userPaddingEnd != VIEW_UNDEFINED_PADDING)
+            {
+                viewParams->_userPaddingLeft = viewParams->_userPaddingEnd;
+            }
+            else
+            {
+                viewParams->_userPaddingLeft = viewParams->_userPaddingLeftInitial;
+            }
+            break;
+            
+        case VIEW_LAYOUT_DIRECTION_LTR:
+        default:
+            if (viewParams->_userPaddingStart != VIEW_UNDEFINED_PADDING)
+            {
+                viewParams->_userPaddingLeft = viewParams->_userPaddingStart;
+            }
+            else
+            {
+                viewParams->_userPaddingLeft = viewParams->_userPaddingLeftInitial;
+            }
+            if (viewParams->_userPaddingEnd != VIEW_UNDEFINED_PADDING)
+            {
+                viewParams->_userPaddingRight = viewParams->_userPaddingEnd;
+            }
+            else
+            {
+                viewParams->_userPaddingRight = viewParams->_userPaddingRightInitial;
+            }
+    }
+    
+    viewParams->_userPaddingBottom = (viewParams->_userPaddingBottom >= 0) ? viewParams->_userPaddingBottom : viewParams->_paddingBottom;
+    
+    [self internalSetPadding:viewParams->_userPaddingLeft
+                         top:viewParams->_paddingTop
+                       right:viewParams->_userPaddingRight
+                      bottom:viewParams->_userPaddingBottom];
+    viewParams->_privateFlags2 |= VIEW_PFLAG2_PADDING_RESOLVED;
+}
+
+- (void)internalSetPadding:(int)left top:(int)top right:(int)right bottom:(int)bottom
+{
+    ViewParams* viewParams = self.viewParams;
+    
+    viewParams->_userPaddingLeft = left;
+    viewParams->_userPaddingRight = right;
+    viewParams->_userPaddingBottom = bottom;
+    
+    const int viewFlags = viewParams->_viewFlags;
+    BOOL changed = NO;
+    
+    if (viewFlags & (VIEW_SCROLLBARS_VERTICAL|VIEW_SCROLLBARS_HORIZONTAL))
+    {
+        if (viewFlags & VIEW_SCROLLBARS_VERTICAL)
+        {
+            const int offset = (viewFlags & VIEW_SCROLLBARS_INSET_MASK) == 0 ? 0 : self.verticalScrollbarWidth;
+            switch (viewParams->_verticalScrollbarPosition)
+            {
+                case VIEW_SCROLLBAR_POSITION_DEFAULT:
+                    if (self.isLayoutRtl)
+                    {
+                        left += offset;
+                    }
+                    else
+                    {
+                        right += offset;
+                    }
+                    break;
+                    
+                case VIEW_SCROLLBAR_POSITION_RIGHT:
+                    right += offset;
+                    break;
+                    
+                case VIEW_SCROLLBAR_POSITION_LEFT:
+                    left += offset;
+                    break;
+            }
+        }
+        if ((viewFlags & VIEW_SCROLLBARS_HORIZONTAL))
+        {
+            bottom += (viewFlags & VIEW_SCROLLBARS_INSET_MASK) == 0 ? 0 : self.horizontalScrollbarHeight;
+        }
+    }
+    
+    if (viewParams->_paddingLeft != left)
+    {
+        changed = true;
+        viewParams->_paddingLeft = left;
+    }
+    if (viewParams->_paddingTop != top)
+    {
+        changed = true;
+        viewParams->_paddingTop = top;
+    }
+    if (viewParams->_paddingRight != right)
+    {
+        changed = true;
+        viewParams->_paddingRight = right;
+    }
+    if (viewParams->_paddingBottom != bottom)
+    {
+        changed = true;
+        viewParams->_paddingBottom = bottom;
+    }
+    
+    if (changed)
+    {
+        [self setNeedsLayout];
+        //TODO:
+    }
+}
+
+- (int)verticalScrollbarWidth
+{
+    //TODO:
+    return 0;
+}
+
+- (int)horizontalScrollbarHeight
+{
+    //TODO:
+    return 0;
 }
 
 @end

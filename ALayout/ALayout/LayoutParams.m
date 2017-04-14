@@ -22,9 +22,21 @@
     return self;
 }
 
+- (instancetype)initWithWidth:(int)width height:(int)height
+{
+    NSDictionary* attr = @{
+                           ViewGroup_Layout_layout_width : @(width).stringValue,
+                           ViewGroup_Layout_layout_height: @(height).stringValue
+                           };
+    if(self = [self initWithAttr:attr])
+    {
+    }
+    return self;
+}
+
 - (instancetype)initWithAttr:(NSDictionary*)attr
 {
-    if(self = [super init])
+    if(self = [self init])
     {
         NSString* width = attr[ViewGroup_Layout_layout_width];
         if(width)

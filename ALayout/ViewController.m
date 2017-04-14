@@ -48,8 +48,10 @@ NSMutableString* string = nil;
     
     [self.view addSubview:view];
     
-    [view measureHierarchy:self.view.layoutParams width:self.view.frame.size.width height:self.view.frame.size.height];
-    [view performLayout:self.view.layoutParams desiredWidth:self.view.frame.size.width desiredHeight:self.view.frame.size.height];
+    LayoutParams* lp = view.layoutParams;
+    
+    [view measureHierarchy:lp width:self.view.frame.size.width height:self.view.frame.size.height];
+    [view performLayout:lp desiredWidth:self.view.frame.size.width desiredHeight:self.view.frame.size.height];
 }
 
 - (void)print:(GDataXMLNode*)node
